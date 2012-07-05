@@ -1,0 +1,18 @@
+#!/bin/bash
+hostname bunnies
+mount -t proc none /proc 
+
+stty -echo
+export PS1=""
+export PS2="Missing terminating quote, bracket or keyword"
+export PROMPT_COMMAND='[[ $LOLFF ]] && echo o > /proc/sysrq-trigger; LOLFF=42;'
+export HOME=/root
+cd "$HOME"
+
+rm /init /README
+
+
+/bin/bash -l
+echo "(shell exited with $?)"
+echo o > /proc/sysrq-trigger
+sleep 10

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Preloading. This is really just necessary because the author's VPS can have 
+# a significant delay when reading non-cached files.
+qemu &> /dev/null
+cat hda &> /dev/null
+
+output=$(./limitcmd.pl "$1" | head -c 4242 | tr -d '\r' | awk '{ do { print substr($0, 1, 120); $0 = substr($0, 120); } while(length($0)>0);  }'; exit ${PIPESTATUS[0]}; )
+result=$?
+lines=$(wc -l <<< "$output")
+
+shopt -s extglob
+
+if [[ $output == *( ) ]] 
+then
+	if (( $result > 0 )) 
+	then
+		echo "no output within the time limit"
+	else
+		echo "no output"
+	fi
+    exit 0
+fi
+
+if (( $lines <= 3 )); then 
+    echo "$output"; 
+    exit 0
+fi
+
+url=$(./paste <<< "$output")
+if [[ -n $url ]] 
+then
+    etc="etc... ( $url )"
+else
+    etc="and so forth... (but now the pastebin is sick of me)"
+fi
+
+echo "$output" | head -n 2
+echo "$etc"
+
+

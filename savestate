@@ -1,0 +1,19 @@
+#!/bin/bash
+image="$1"
+
+mkfifo fifo # &> /dev/null
+[[ -r fifo && -w fifo && -p fifo ]] || { echo "fifo fail"; exit 1; } 
+
+< fifo qemu -kernel bzImage -append "rdinit=/init console=ttyS0,9600n8" -initrd initramfs.cpio.gz  -hda "$image" -net none -m 32 -serial stdio -monitor stdio -nographic  | \
+	while read f
+	do
+		echo "$f" >&2
+		[[ $f == "Freeing unused kernel memory"* ]] && { 
+			sleep 3
+			echo $'\x01c'
+			echo 'savevm start'
+			echo 'quit'
+		}
+	done > fifo
+
+rm -f fifo

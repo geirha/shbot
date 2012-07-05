@@ -1,0 +1,2 @@
+set +H
+shopt -s extglob
