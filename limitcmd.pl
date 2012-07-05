@@ -13,7 +13,7 @@ sub signal_handler($) {
 
 $child = fork;
 if($child == 0) {
-    exec "./runqemu", $ARGV[0] or die "internal error :(";
+    exec "./runqemu", $ARGV[0], $ARGV[1] or die "internal error :(";
 }
 
 foreach my $sig (@signals) {

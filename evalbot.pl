@@ -34,7 +34,7 @@ sub my_sigint_catcher {
 my $irc = new Net::IRC;
 my $conn = $irc->newconn( Server => "$server",
     Nick => "$nick",
-    Ircname => "evalbot, owned by $owner" );
+    Ircname => "shbot, owned by $owner, based on evalbot" );
 
 
 my $joined=0;
@@ -80,8 +80,18 @@ sub message
     my( $conn, $event ) = @_;
     my( $msg ) = $event->args;
 
-    if( $msg =~/^# (.*)/ ) {
-        open(FOO, "-|", "./evalcmd", "$1");
+    if( $msg =~/^([2-4k]|sh|k?93)# botsnack$/ ) {
+        $conn->privmsg($event->to, "Core dumped.");
+    } elsif( $msg =~/^([2-4k]|sh|k?93)# botsmack$/ ) {
+        $conn->privmsg($event->to, "Segmentation fault");
+    } elsif( $msg =~/^([2-4]|sh)# (.*)/ ) {
+        open(FOO, "-|", "./evalcmd", "_$1", "$2");
+        while(<FOO>) { 
+            $conn->privmsg($event->to, $event->nick . ": $_");
+        }
+        close(FOO);
+    } elsif( $msg =~/^(k|k?93)# (.*)/ ) {
+        open(FOO, "-|", "./evalcmd", "_k93", "$2");
         while(<FOO>) { 
             $conn->privmsg($event->to, $event->nick . ": $_");
         }
@@ -101,11 +111,23 @@ sub private
 	 $conn->privmsg( "$owner", "< " . $event->nick . "> $msg" );
 
      if($msg =~ /^!help.*/) {
-         $conn->privmsg( $event->nick, "Usage:  # cmd" );
+         $conn->privmsg( $event->nick, "Usage: 4# cmd" );
 	 } elsif($msg =~ /^!raw $password (.*)/) {
 		 $conn->sl($1);
+     } elsif( $msg =~/^([2-4]|sh)# (.*)/ ) {
+         open(FOO, "-|", "./evalcmd", "_$1", "$2");
+         while(<FOO>) { 
+             $conn->privmsg($event->nick, "$_");
+         }
+         close(FOO);
+     } elsif( $msg =~/^(k|k?93)# (.*)/ ) {
+         open(FOO, "-|", "./evalcmd", "_k93", "$2");
+         while(<FOO>) { 
+             $conn->privmsg($event->nick, "$_");
+         }
+         close(FOO);
 	 } elsif( $msg =~/^#? ?(.*)/ ) {
-         open(FOO, "-|", "./evalcmd", "$1");
+         open(FOO, "-|", "./evalcmd", "_4", "$1");
          while(<FOO>) { 
              $conn->privmsg($event->nick, "$_");
          }
