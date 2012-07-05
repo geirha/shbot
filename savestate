@@ -4,7 +4,7 @@ image="$1"
 mkfifo fifo # &> /dev/null
 [[ -r fifo && -w fifo && -p fifo ]] || { echo "fifo fail"; exit 1; } 
 
-< fifo qemu -kernel bzImage -append "rdinit=/init console=ttyS0,9600n8" -initrd initramfs.cpio.gz  -hda "$image" -net none -m 32 -serial stdio -monitor stdio -nographic  | \
+< fifo qemu -kernel bzImage -append "rdinit=/init console=ttyS0,9600n8" -initrd initramfs.cpio.gz  -hda "$image" -net none -m 32 -nographic -no-kvm |
 	while read f
 	do
 		echo "$f" >&2
