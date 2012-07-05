@@ -1,2 +1,2 @@
-set +H
-shopt -s extglob
+if [ "$BASH_VERSION" ]; then set +H; shopt -s extglob; fi
+[ "${BASH_VERSION%%.*}" = 4 ] && shopt -s globstar
