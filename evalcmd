@@ -1,6 +1,6 @@
 #!/bin/bash
 
-output=$(./limitcmd.pl "$1" | head -c 4242 | tr -d '\r' | awk '{ do { print substr($0, 1, 120); $0 = substr($0, 120); } while(length($0)>0);  }'; exit ${PIPESTATUS[0]}; )
+output=$(./limitcmd.pl "$1" | head -c 4242 | tr -d '\r' | awk '{ do { print substr($0, 1, 120); $0 = substr($0, 121); } while(length($0)>0);  }'; exit ${PIPESTATUS[0]}; )
 result=$?
 lines=$(wc -l <<< "$output")
 
