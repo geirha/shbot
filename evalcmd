@@ -18,7 +18,7 @@ then
 fi
 
 if (( $lines <= 3 )); then 
-    echo "$output"; 
+    printf '%s\n' "$output"; 
     exit 0
 fi
 
@@ -30,7 +30,7 @@ else
     etc="and so forth... (but now the pastebin is sick of me)"
 fi
 
-echo "$output" | head -n 2
-echo "$etc"
+printf '%s\n' "$output" | head -n 2
+printf '%s\n' "$etc"
 
 
