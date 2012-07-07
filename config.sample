@@ -1,5 +1,5 @@
 # The bot's nick
-$nick="evalbot";
+$nick="shbot";
 
 # The IRC server
 $server="irc.freenode.net";
@@ -14,7 +14,7 @@ $password="";
 $nickserv="";
 
 # The channels to join
-@channels=("#evalbot");
+@channels=("#bash", "#evalbot", "#awk", "##sed", "##bash-fr");
 
 # Just leave this
 true;
