@@ -1,4 +1,2 @@
 #!/bin/bash
-contents="$(< /dev/stdin )"
-
-curl -i -s -F "code2=$contents" -F 'expiry=d' -F 'poster=evalbot' -F 'email=' -F 'format=text' -F 'paste=Send' -F 'parentpid='  http://pastebin.com/pastebin.php | sed -n 's/Location: //p' | tr -d '\r'
+curl -F 'sprunge=<-' http://sprunge.us

@@ -22,7 +22,7 @@ if (( $lines <= 3 )); then
     exit 0
 fi
 
-url=$(./paste <<< "$output")
+read -r url < <(./paste <<< "$output")
 if [[ -n $url ]] 
 then
     etc="etc... ( $url )"
