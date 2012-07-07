@@ -39,31 +39,31 @@ my $conn = $irc->newconn( Server => "$server",
 
 my $joined=0;
 
-sub my_alarm {
-    if($joined==0) {
-		if($nickserv) {
-			$conn->sl("NICKSERV identify $nickserv");
-		}
-		foreach (@channels) {   
-			$conn->join( "$_" );
-		}
-        $joined=1;
+sub join_channels {
+    foreach (@channels) {   
+	$conn->join( "$_" );
     }
+    $joined=1;
+}
 
+sub my_alarm {
+    if(!$nickserv) {
+	if ($joined==0) {
+	    join_channels();
+	}
+    }
     $conn->privmsg("$nick", "ping");
     alarm(60);
 }
 
-alarm(10);
-
-
+alarm(60);
 
 # Connect the handlers to the events.
 $conn->add_handler( 376, \&join_channel );
 $conn->add_handler( 422, \&join_channel );
 $conn->add_handler( 'public', \&message );
 $conn->add_handler( 'msg', \&private );
-
+$conn->add_handler( 'notice', \&notice );
 
 # Start the Net::IRC event loop.
 $irc->start;
@@ -71,7 +71,6 @@ $irc->start;
 sub join_channel
 {
     my( $conn, $event ) = @_;
-
     print( "Currently online\n" );
 }
 
@@ -79,10 +78,10 @@ sub message
 {
     my( $conn, $event ) = @_;
     my( $msg ) = $event->args;
-
-    if( $msg =~/^([2-4k]|sh|k?93)# botsnack$/ ) {
+    
+    if( $msg =~/^([2-4k]|sh|k?93)?# botsnack$/ ) {
         $conn->privmsg($event->to, "Core dumped.");
-    } elsif( $msg =~/^([2-4k]|sh|k?93)# botsmack$/ ) {
+    } elsif( $msg =~/^([2-4k]|sh|k?93)?# botsmack$/ ) {
         $conn->privmsg($event->to, "Segmentation fault");
     } elsif( $msg =~/^([2-4]|sh)# (.*)/ ) {
         open(FOO, "-|", "./evalcmd", "_$1", "$2");
@@ -96,15 +95,19 @@ sub message
             $conn->privmsg($event->to, $event->nick . ": $_");
         }
         close(FOO);
-    }
-
-
+    }  elsif( $msg =~ /^# (.*)/ ) {
+         open(FOO, "-|", "./evalcmd", "_4", "$1");
+         while(<FOO>) { 
+              $conn->privmsg($event->to, $event->nick . ": $_");
+         }
+         close(FOO);
+     }
 }
 
 sub private 
 {
-	 my( $conn, $event ) = @_;
-	 my( $msg ) = $event->args;  
+    my( $conn, $event ) = @_;
+    my( $msg ) = $event->args;  
 
      if($event->nick =~ /^$nick$/) { return; } #lol 
 
@@ -126,14 +129,27 @@ sub private
              $conn->privmsg($event->nick, "$_");
          }
          close(FOO);
-	 } elsif( $msg =~/^#? ?(.*)/ ) {
+     } elsif( $msg =~/^#? ?(.*)/ ) {
          open(FOO, "-|", "./evalcmd", "_4", "$1");
          while(<FOO>) { 
              $conn->privmsg($event->nick, "$_");
          }
          close(FOO);
      }
+}
 
+sub notice
+{
+    my( $conn, $event ) = @_;
+    my( $msg ) = $event->args;  
+    if ( $event->nick eq "NickServ" ) {
+	if($joined==0) {
+	    if($nickserv) {
+		$conn->privmsg("NickServ", "identify $nickserv");
+	    }
+	    join_channels();
+	}
+    }
 }
 
 
