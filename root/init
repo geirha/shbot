@@ -2,12 +2,14 @@
 mknod -m 666 /dev/null c 1 3
 mknod -m 666 /dev/zero c 1 5
 mknod -m 666 /dev/full c 1 7
+mknod -m 644 /dev/random c 1 8
+mknod -m 644 /dev/urandom c 1 9
 ln -s console /dev/tty
 hostname bunnies
 mount -t proc none /proc 
 
 stty -echo
-export PS1='$(mkdir /tmp/... 2>/dev/null||command echo o >/proc/sysrq-trigger)'
+export PS1='$({ mkdir /tmp/... || echo o >/proc/sysrq-trigger; set +x; } 2>/dev/null)'
 export PS2="Missing terminating quote, bracket or keyword"
 export HOME=/root
 cd "$HOME"
