@@ -5,16 +5,13 @@ state=$2
 mkfifo fifo # &> /dev/null
 [[ -r fifo && -w fifo && -p fifo ]] || { echo "fifo fail"; exit 1; } 
 
-< fifo qemu -kernel bzImage -append "rdinit=/init console=ttyS0,9600n8 -- $state" -initrd initramfs.cpio.gz  -hda "$image" -net none -m 32 -nographic |
-	while read f
-	do
-		echo "$f" >&2
-		[[ $f == "Freeing unused kernel memory"* ]] && { 
-			sleep 3
-			echo $'\x01c'
-			echo "savevm $state"
-			echo 'quit'
-		}
-	done > fifo
+< fifo kvm -kernel bzImage -append "-- $state" -initrd initramfs.cpio.gz  -hda "$image" -net none -m 32 -nographic -no-kvm |
+    while read -r f
+    do
+        printf '%s\n' "$f" >&2
+        if [[ $f = $'Ready\r' ]]; then
+            printf '\x01c\nsavevm %s\nquit\n' "$state"
+        fi
+    done > fifo
 
 rm -f fifo

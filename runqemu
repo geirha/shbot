@@ -1,5 +1,5 @@
 #!/bin/bash
-exec qemu -hda hda -net none -m 32 -nographic -loadvm "$1"  2>&1  <<< "\
+exec kvm -hda hda -net none -m 32 -nographic -loadvm "$1" -no-kvm 2>&1  <<< "\
 $RANDOM
 $(date -u +%s)
 $2"
