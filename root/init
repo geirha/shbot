@@ -6,6 +6,8 @@ mknod -m 644 /dev/random c 1 8
 mknod -m 644 /dev/urandom c 1 9
 ln -s console /dev/tty
 hostname bunnies
+mkdir -p /proc /tmp
+chmod 1777 /tmp
 mount -t proc none /proc 
 
 stty -echo
