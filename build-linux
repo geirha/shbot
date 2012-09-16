@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [[ $1 != *.bz2 ]]; then
+    printf 'No url or filename to a linux bzip2ed tarball provided.\n' >&2
+    exit 1
+fi
+
+kernel=$1
+if [[ ! -f $kernel ]]; then # assuming url
+    wget -nc "$kernel" || exit
+    kernel=${kernel##*/}
+fi
+
+bzip2 -cd "$kernel" | pax -r &&
+dir=${kernel##*/} dir=${dir%.tar.bz2} &&
+cp kernel.config "$dir/.config" &&
+cd "$dir" &&
+make silentoldconfig &&
+make &&
+for file in arch/*/boot/bzImage; do
+    cp "$file" ../bzImage || exit
+    break
+done
