@@ -1,0 +1,365 @@
+#!/bin/bash
+
+#cp() { echo cp "$@"; }
+#mkdir() { echo mkdir "$@"; }
+#ln() { echo ln "$@"; }
+#chmod() { echo chmod "$@"; }
+
+declare -A commands='(
+
+    ## POSIX commands
+
+    [\[]="evaluate expression"
+    [asa]="[FR] interpret carriage-control characters"
+    [basename]="return non-directory portion of a pathname"
+    [bc]="arbitrary-precision arithmetic language"
+    [cal]="[XSI] print a calendar"
+    [cat]="concatenate and print files"
+    [chgrp]="change the file group ownership"
+    [chmod]="change the file modes"
+    [chown]="change the file ownership"
+    [cksum]="write file checksums and sizes"
+    [cmp]="compare two files"
+    [comm]="select or reject lines common to two files"
+    [compress]="[XSI] compress data"
+    [cp]="copy files"
+    [csplit]="split files based on context"
+    [cut]="cut out selected fields of each line of a file"
+    [date]="write the date and time"
+    [dd]="convert and copy a file"
+    [df]="report free disk space"
+    [diff]="compare two files"
+    [dirname]="return the directory portion of a pathname"
+    [du]="estimate file space usage"
+    [echo]="write arguments to standard output"
+    [ed]="edit text"
+    [env]="set the environment for command invocation"
+    [expand]="convert tabs to spaces"
+    [expr]="evaluate arguments as an expression"
+    [false]="return false value"
+    [file]="determine file type"
+    [find]="find files"
+    [fold]="filter for folding lines"
+    [fuser]="[XSI] list process IDs of all processes that have one or more files open"
+    [gencat]="generate a formatted message catalog"
+    [getconf]="get configuration values"
+    [grep]="search a file for a pattern"
+    [head]="copy the first part of files"
+    [iconv]="codeset conversion"
+    [id]="return user identity"
+    [ipcrm]="[XSI] remove an XSI message queue, semaphore set, or shared memory segment identifier"
+    [ipcs]="[XSI] report XSI interprocess communication facilities status"
+    [join]="relational database operator"
+    [kill]="terminate or signal processes"
+    [link]="[XSI] call link function"
+    [ln]="link files"
+    [locale]="get locale-specific information"
+    [localedef]="define locale environment"
+    [logger]="log messages"
+    [logname]="return the user'\''s login name"
+    [ls]="list directory contents"
+    [m4]="macro processor"
+    [mailx]="process messages"
+    [mkdir]="make directories"
+    [mkfifo]="make FIFO special files"
+    [mv]="move files"
+    [newgrp]="change to a new group"
+    [nice]="invoke a utility with an altered nice value"
+    [nl]="[XSI] line numbering filter"
+    [nm]="[XSI]|[SD] write the name list of an object file (DEVELOPMENT)"
+    [nohup]="invoke a utility immune to hangups"
+    [od]="dump files in various formats"
+    [paste]="merge corresponding or subsequent lines of files"
+    [patch]="apply changes to files"
+    [pathchk]="check pathnames"
+    [pax]="portable archive interchange"
+    [pr]="print files"
+    [printf]="write formatted output"
+    [ps]="report process status"
+    [pwd]="return working directory name"
+    [renice]="set nice values of running processes"
+    [rm]="remove directory entries"
+    [rmdir]="remove directories"
+    [sed]="stream editor"
+    [sleep]="suspend execution for an interval"
+    [sort]="sort, merge, or sequence check text files"
+    [split]="split files into pieces"
+    [strings]="find printable strings in files"
+    [stty]="set the options for a terminal"
+    [tabs]="set terminal tabs"
+    [tail]="copy the last part of a file"
+    [tee]="duplicate standard input"
+    [test]="evaluate expression"
+    [time]="time a simple command"
+    [touch]="change file access and modification times"
+    [tput]="change terminal characteristics"
+    [tr]="translate characters"
+    [true]="return true value"
+    [tsort]="topological sort"
+    [tty]="return user'\''s terminal name"
+    [uname]="return system name"
+    [uncompress]="[XSI] expand compressed data"
+    [unexpand]="convert spaces to tabs"
+    [uniq]="report or filter out repeated lines in a file"
+    [unlink]="[XSI] call the unlink function"
+    [uudecode]="decode a binary file"
+    [uuencode]="encode a binary file"
+    [wc]="word, line, and byte or character count"
+    [who]="display who is on the system"
+    [xargs]="construct argument lists and invoke utility"
+    [zcat]="[XSI] expand and concatenate data"
+
+    ## Compilation and linking and stuff
+    #[ar]="[SD]|[XSI] create and maintain library archives"
+    #[c99]="[CD] compile standard C programs"
+    #[cflow]="[XSI] generate a C-language flowgraph (DEVELOPMENT)"
+    #[ctags]="[SD] create a tags file (DEVELOPMENT, FORTRAN)"
+    #[cxref]="[XSI] generate a C-language program cross-reference table (DEVELOPMENT)"
+    #[fort77]="[FD] FORTRAN compiler (FORTRAN)"
+    #[lex]="[CD] generate programs for lexical tasks (DEVELOPMENT)"
+    #[make]="[SD] maintain, update, and regenerate groups of programs (DEVELOPMENT)"
+    #[strip]="[SD] remove unnecessary information from strippable files (DEVELOPMENT)"
+    #[yacc]="[CD] yet another compiler compiler (DEVELOPMENT)"
+
+    ## Utilities that would be pointless as external binaries
+    #[alias]="define or display aliases"
+    #[bg]="[UP] run jobs in the background"
+    #[cd]="change the working directory"
+    #[command]="execute a simple command"
+    #[fc]="[UP] process the command history list"
+    #[fg]="[UP] run jobs in the foreground"
+    #[getopts]="parse utility options"
+    #[hash]="remember or report utility locations"
+    #[jobs]="[UP] display status of jobs in the current session"
+    #[read]="read a line from standard input"
+    #[type]="[XSI] write a description of command type"
+    #[ulimit]="[XSI] set or report file size limit"
+    #[umask]="get or set the file mode creation mask"
+    #[unalias]="remove alias definitions"
+    #[wait]="await process completion"
+
+    ## SCCS crap
+    #[admin]="[XSI] create and administer SCCS files (DEVELOPMENT)"
+    #[delta]="[XSI] make a delta (change) to an SCCS file (DEVELOPMENT)"
+    #[get]="[XSI] get a version of an SCCS file (DEVELOPMENT)"
+    #[prs]="[XSI] print an SCCS file (DEVELOPMENT)"
+    #[rmdel]="[XSI] remove a delta from an SCCS file (DEVELOPMENT)"
+    #[sact]="[XSI] print current SCCS file-editing activity (DEVELOPMENT)"
+    #[sccs]="[XSI] front end for the SCCS subsystem (DEVELOPMENT)"
+    #[unget]="[XSI] undo a previous get of an SCCS file (DEVELOPMENT)"
+    #[val]="[XSI] validate SCCS files (DEVELOPMENT)"
+    #[what]="[XSI] identify SCCS files (DEVELOPMENT)"
+
+    ## POSIX commands that does not really make sense for the bot
+    #[at]="execute commands at a later time"
+    #[batch]="schedule commands to be executed in a batch queue"
+    #[crontab]="schedule periodic background work"
+    #[lp]="send files to a printer"
+    #[man]="display system documentation"
+    #[mesg]="permit or deny messages"
+    #[more]="[UP] display files on a page-by-page basis"
+    #[qalter]="[OB_BE] alter batch job"
+    #[qdel]="[OB_BE] delete batch jobs"
+    #[qhold]="[OB_BE] hold batch jobs"
+    #[qmove]="[OB_BE] move batch jobs"
+    #[qmsg]="[OB_BE] send message to batch jobs"
+    #[qrerun]="[OB_BE] rerun batch jobs"
+    #[qrls]="[OB_BE] release batch jobs"
+    #[qselect]="[OB_BE] select batch jobs"
+    #[qsig]="[OB_BE] signal batch jobs"
+    #[qstat]="[OB_BE] show status of batch jobs"
+    #[qsub]="[OB_BE] submit a script"
+    #[talk]="[UP] talk to another user"
+    #[uucp]="[UU] system-to-system copy"
+    #[uustat]="[UU] uucp status enquiry and job control"
+    #[uux]="[UU] remote command execution"
+    #[vi]="[UP] screen-oriented (visual) display editor"
+    #[write]="write to another user"
+
+    ## Handled specially
+    #[awk]="pattern scanning and processing language"
+    #[ex]="[UP] text editor"
+    #[sh]="shell, the standard command language interpreter"
+
+    ## Other useful commands (non-POSIX)
+    [bzip2]="a block-sorting file compressor, v1.0.6"
+    [dash]="command interpreter (shell)"
+    [gawk]="pattern scanning and processing language"
+    [getent]="get entries from administrative database"
+    [gzip]="compress or expand files"
+    [hostname]="show or set the system'\''s host name"
+    [mawk]="pattern scanning and text processing language"
+    [mknod]="make block or character special files"
+    [mktemp]="create a temporary file or directory"
+    [mount]="mount a filesystem"
+    [ksh]="KornShell, a command and programming language"
+    [recode]="converts files between character sets"
+    [setsid]="run a program in a new session"
+    [strace]="trace system calls and signals"
+    [tac]="concatenate and print files in reverse"
+    [umount]="unmount file systems"
+)'
+
+
+mkdir -p initramfs/{bin,dev,etc,lib,root,usr/share}
+
+declare -A command_paths='()' lib_paths='()'
+
+for cmd in "${!commands[@]}"; do
+    if ! path=$(readlink -f "$(type -P "$cmd")") 2>/dev/null; then
+        printf >&2 'WARNING: not found: %s - %s\n' "$cmd" "${commands[$cmd]}"
+        continue
+    fi
+    command_paths[$cmd]=$path
+    while read -r lib _ location _; do
+        if [[ $location = /* ]]; then
+            lib_paths[${location##*/}]=$location
+        fi
+    done < <(ldd "$path" 2>/dev/null)
+done
+
+for lib in "${!lib_paths[@]}"; do
+    cp "${lib_paths[$lib]}" "initramfs/lib/$lib"
+done
+
+for cmd in "${!command_paths[@]}"; do
+    cp "${command_paths[$cmd]}" "initramfs/bin/$cmd"
+    strip "$initramfs/bin/$cmd" 2>/dev/null
+done
+
+case $(uname -m) in
+    x86_64) cp /lib64/ld-linux-x86-64.so.2 initramfs/lib;;
+         *) cp /lib/ld-linux.so.2 initramfs/lib/;;
+esac
+
+
+## Some additional commands
+
+cat > initramfs/bin/bunzip2 << 'EOF'
+#!/bin/sh
+exec bzip2 -d ${1+"$@"}
+EOF
+cat > initramfs/bin/bzcat << 'EOF'
+#!/bin/sh
+exec bzip2 -cd ${1+"$@"}
+EOF
+cat > initramfs/bin/gunzip << 'EOF'
+#!/bin/sh
+exec gzip -d ${1+"$@"}
+EOF
+cat > initramfs/bin/zcat << 'EOF'
+#!/bin/sh
+exec gzip -cd ${1+"$@"}
+EOF
+chmod +x initramfs/bin/{bunzip2,bzcat,gunzip,zcat}
+
+# Some useful symlinks
+ln -sf /proc/self/fd initramfs/dev/
+ln -sf /proc/self/fd/0 initramfs/dev/stdin
+ln -sf /proc/self/fd/1 initramfs/dev/stdout
+ln -sf /proc/self/fd/2 initramfs/dev/stderr
+
+# file's magic database
+cp -r /usr/share/file initramfs/usr/share/
+
+# /etc/*
+
+cat > initramfs/etc/group << 'EOF'
+root:x:0:
+EOF
+
+cat > initramfs/etc/inputrc << 'EOF'
+set convert-meta off
+EOF
+
+cat > initramfs/etc/nsswitch.conf << 'EOF'
+group:  compat
+passwd: compat
+EOF
+cp "$(ldconfig -p|awk '$1=="libnss_compat.so.2"{print $NF;exit}')" "initramfs/lib/libnss_compat.so.2"
+
+cat > initramfs/etc/passwd << 'EOF'
+root:x:0:0:root:/root:/bin/bash
+EOF
+
+# /root/*
+cat > initramfs/root/.profile << 'EOF'
+[ -n "$BASH" ] && [ -f ~/.bashrc ] && . ~/.bashrc
+
+[ -f ~/.savestate ] && . ~/.savestate
+rm -f ~/.savestate
+EOF
+cat > initramfs/root/.savestate << 'EOF'
+printf "Ready\n" # Tells savestate it's ok to save now
+read RANDOM
+read date
+date -s "1970-01-01 + $date seconds" > /dev/null 2>&1
+printf %d "$RANDOM" > /dev/urandom
+
+unset date
+EOF
+cat > initramfs/root/.bashrc << 'EOF'
+# Various useful options for various bash versions.
+{
+    set +H
+    shopt -s extglob
+    shopt -s globstar
+} 2>/dev/null
+EOF
+
+# /init
+cat > initramfs/init << 'EOF'
+#!/bin/bash
+chown -R root:root /
+mknod -m 660 /dev/ttyS0 c 4 64
+mknod -m 666 /dev/null c 1 3
+mknod -m 666 /dev/zero c 1 5
+mknod -m 666 /dev/full c 1 7
+mknod -m 644 /dev/random c 1 8
+mknod -m 644 /dev/urandom c 1 9
+ln -sf ttyS0 /dev/tty
+
+hostname bunnies
+mkdir -p /proc /tmp
+chmod 1777 /tmp
+mount -t proc none /proc 
+
+stty -echo
+export PS1='$({ mkdir /tmp/... || printf o >/proc/sysrq-trigger; set +x; } 2>/dev/null)'
+export PS2="Missing terminating quote, bracket or keyword"
+export HOME=/root
+export PATH=/bin
+cd "$HOME"
+
+case $2 in
+    _1) setsid bash1 -login ;;
+    _[234]) setsid "bash${2#_}" -l ;;
+    _k93) setsid ksh -l ;;
+    _sh) setsid sh -l ;;
+    *) setsid bash -l ;;
+esac
+
+printf "(shell exited with %d)\n" "$?"
+printf o > /proc/sysrq-trigger
+EOF
+chmod +x initramfs/init
+
+# Shells
+shopt -s nullglob
+f=(bash1.*); (( ${#f[@]} )) && cp "${f[-1]}" "initramfs/bin/bash1" && ln -sf bash1 initramfs/bin/bash
+f=(bash2.*); (( ${#f[@]} )) && cp "${f[-1]}" "initramfs/bin/bash2" && ln -sf bash2 initramfs/bin/bash
+f=(bash3.*); (( ${#f[@]} )) && cp "${f[-1]}" "initramfs/bin/bash3" && ln -sf bash3 initramfs/bin/bash
+f=(bash4.*); (( ${#f[@]} )) && cp "${f[-1]}" "initramfs/bin/bash4" && ln -sf bash4 initramfs/bin/bash
+
+for shell in dash ksh bash{4..1}; do
+    [[ -e initramfs/bin/$shell ]] || continue
+    ln -sf "$shell" initramfs/bin/sh
+    break
+done
+
+# awk
+for awk in gawk mawk; do
+    [[ -e initramfs/bin/$awk ]] || continue;
+    ln -sf "$awk" initramfs/bin/awk
+    break
+done
