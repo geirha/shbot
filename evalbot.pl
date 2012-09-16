@@ -79,18 +79,18 @@ sub message
     my( $conn, $event ) = @_;
     my( $msg ) = $event->args;
     
-    if( $msg =~/^([2-4k]|sh|k?93)?# botsnack$/ ) {
+    if( $msg =~/^([1-4k]|sh)?# botsnack$/ ) {
         $conn->privmsg($event->to, "Core dumped.");
-    } elsif( $msg =~/^([2-4k]|sh|k?93)?# botsmack$/ ) {
+    } elsif( $msg =~/^([1-4k]|sh)?# botsmack$/ ) {
         $conn->privmsg($event->to, "Segmentation fault");
-    } elsif( $msg =~/^([2-4]|sh)# (.*)/ ) {
+    } elsif( $msg =~/^([1-4]|sh)# (.*)/ ) {
         open(FOO, "-|", "./evalcmd", "_$1", "$2");
         while(<FOO>) { 
             $conn->privmsg($event->to, $event->nick . ": $_");
         }
         close(FOO);
-    } elsif( $msg =~/^(k|k?93)# (.*)/ ) {
-        open(FOO, "-|", "./evalcmd", "_k93", "$2");
+    } elsif( $msg =~/^k# (.*)/ ) {
+        open(FOO, "-|", "./evalcmd", "_k93", "$1");
         while(<FOO>) { 
             $conn->privmsg($event->to, $event->nick . ": $_");
         }
@@ -117,14 +117,14 @@ sub private
          $conn->privmsg( $event->nick, "Usage: 4# cmd" );
 	 } elsif($msg =~ /^!raw $password (.*)/) {
 		 $conn->sl($1);
-     } elsif( $msg =~/^([2-4]|sh)# (.*)/ ) {
+     } elsif( $msg =~/^([1-4]|sh)# (.*)/ ) {
          open(FOO, "-|", "./evalcmd", "_$1", "$2");
          while(<FOO>) { 
              $conn->privmsg($event->nick, "$_");
          }
          close(FOO);
-     } elsif( $msg =~/^(k|k?93)# (.*)/ ) {
-         open(FOO, "-|", "./evalcmd", "_k93", "$2");
+     } elsif( $msg =~/^k# (.*)/ ) {
+         open(FOO, "-|", "./evalcmd", "_k93", "$1");
          while(<FOO>) { 
              $conn->privmsg($event->nick, "$_");
          }
