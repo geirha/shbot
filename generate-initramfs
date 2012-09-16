@@ -205,6 +205,16 @@ mkdir -p initramfs/{bin,dev,etc,lib,root,usr/share}
 
 declare -A command_paths='()' lib_paths='()'
 
+case $(uname -m) in
+    x86_64)
+        mkdir -p initramfs/lib64 &&
+        cp /lib64/ld-linux-x86-64.so.2 initramfs/lib64/
+    ;;
+    *)
+        cp /lib/ld-linux.so.2 "$libdir"
+    ;;
+esac || exit
+
 for cmd in "${!commands[@]}"; do
     if ! path=$(readlink -f "$(type -P "$cmd")") 2>/dev/null; then
         printf >&2 'WARNING: not found: %s - %s\n' "$cmd" "${commands[$cmd]}"
@@ -227,10 +237,6 @@ for cmd in "${!command_paths[@]}"; do
     strip "$initramfs/bin/$cmd" 2>/dev/null
 done
 
-case $(uname -m) in
-    x86_64) cp /lib64/ld-linux-x86-64.so.2 initramfs/lib;;
-         *) cp /lib/ld-linux.so.2 initramfs/lib/;;
-esac
 
 
 ## Some additional commands
