@@ -4,6 +4,8 @@ if [[ $1 != *.bz2 ]]; then
     printf 'No url or filename to a linux bzip2ed tarball provided.\n' >&2
     exit 1
 fi
+mkdir -p build/ &&
+cd build || exit
 
 kernel=$1
 if [[ ! -f $kernel ]]; then # assuming url
@@ -13,7 +15,7 @@ fi
 
 bzip2 -cd "$kernel" | pax -r &&
 dir=${kernel##*/} dir=${dir%.tar.bz2} &&
-cp kernel.config "$dir/.config" &&
+cp ../kernel.config "$dir/.config" &&
 cd "$dir" &&
 make silentoldconfig &&
 make &&

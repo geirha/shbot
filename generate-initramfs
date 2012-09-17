@@ -1,9 +1,6 @@
 #!/bin/bash
 
-#cp() { echo cp "$@"; }
-#mkdir() { echo mkdir "$@"; }
-#ln() { echo ln "$@"; }
-#chmod() { echo chmod "$@"; }
+PATH=$PWD/build/bin:$PATH
 
 declare -A commands='(
 
@@ -184,11 +181,9 @@ declare -A commands='(
     ## Other useful commands (non-POSIX)
     [bzip2]="a block-sorting file compressor, v1.0.6"
     [dash]="command interpreter (shell)"
-    [gawk]="pattern scanning and processing language"
     [getent]="get entries from administrative database"
     [gzip]="compress or expand files"
     [hostname]="show or set the system'\''s host name"
-    [mawk]="pattern scanning and text processing language"
     [mknod]="make block or character special files"
     [mktemp]="create a temporary file or directory"
     [mount]="mount a filesystem"
@@ -198,8 +193,19 @@ declare -A commands='(
     [strace]="trace system calls and signals"
     [tac]="concatenate and print files in reverse"
     [umount]="unmount file systems"
-)'
 
+    ## Built with build-bash and build-awk
+    [bash1]="GNU Bourne-Again SHell 1.x"
+    [bash2]="GNU Bourne-Again SHell 2.x"
+    [bash3]="GNU Bourne-Again SHell 3.x"
+    [bash4]="GNU Bourne-Again SHell 4.x"
+    [bwk]="pattern-directed scanning and processing language"
+    [gawk3]="pattern scanning and processing language"
+    [gawk4]="pattern scanning and processing language"
+    [mawk]="pattern scanning and text processing language"
+    [nawk]="pattern-directed scanning and processing language"
+    [oawk]="pattern scanning and processing language"
+)'
 
 mkdir -p initramfs/{bin,dev,etc,lib,root,usr/share}
 
@@ -348,24 +354,29 @@ esac
 printf "(shell exited with %d)\n" "$?"
 printf o > /proc/sysrq-trigger
 EOF
-chmod +x initramfs/init
+chmod 750 initramfs/init
 
-# Shells
 shopt -s nullglob
-f=(bash1.*); (( ${#f[@]} )) && cp "${f[-1]}" "initramfs/bin/bash1" && ln -sf bash1 initramfs/bin/bash
-f=(bash2.*); (( ${#f[@]} )) && cp "${f[-1]}" "initramfs/bin/bash2" && ln -sf bash2 initramfs/bin/bash
-f=(bash3.*); (( ${#f[@]} )) && cp "${f[-1]}" "initramfs/bin/bash3" && ln -sf bash3 initramfs/bin/bash
-f=(bash4.*); (( ${#f[@]} )) && cp "${f[-1]}" "initramfs/bin/bash4" && ln -sf bash4 initramfs/bin/bash
+# decide on a /bin/bash
+bashes=( initramfs/bin/bash[1-4] )
+ln -sf "${bashes[-1]##*/}" initramfs/bin/bash || exit
 
-for shell in dash ksh bash{4..1}; do
-    [[ -e initramfs/bin/$shell ]] || continue
-    ln -sf "$shell" initramfs/bin/sh
+
+# decide on a /bin/sh
+for shell in initramfs/bin/{dash,ksh,bash}; do
+    [[ -e $shell ]] || continue
+    ln -sf "${shell##*/}" initramfs/bin/sh
     break
 done
 
-# awk
-for awk in gawk mawk; do
+[[ -e initramfs/bin/sh ]] || exit
+
+# awk symlinks
+awks=( initramfs/bin/gawk?* )
+ln -s "${awks[-1]##*/}" initramfs/bin/gawk || exit
+    
+for awk in nawk mawk gawk oawk bwk; do
     [[ -e initramfs/bin/$awk ]] || continue;
-    ln -sf "$awk" initramfs/bin/awk
+    ln -s "$awk" initramfs/bin/awk
     break
 done

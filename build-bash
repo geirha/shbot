@@ -1,8 +1,10 @@
 #!/bin/bash
 
-version=$1
+version=$1 bin_name=${2:-bash$version}
 
-wget -nc "http://ftp.gnu.org/gnu/bash/bash-$version.tar.gz" &&
+mkdir -p build/bin &&
+cd build &&
+wget -c -O "bash-$version.tar.gz" "http://ftp.gnu.org/gnu/bash/bash-$version.tar.gz" &&
 gzip -cd "bash-$version.tar.gz" | pax -r || exit
 
 configure_opts=()
@@ -96,4 +98,4 @@ fi
 
 ./configure "${configure_opts[@]}" &&
 make &&
-cp bash "../bash$version"
+cp bash "../bin/$bin_name"

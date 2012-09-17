@@ -1,0 +1,50 @@
+#!/bin/bash
+
+awk=$1 version=$2 bin_name=${3:-$1$2}
+
+mkdir -p build/bin &&
+cd build &&
+case $awk in
+    bwk)
+        wget -c -O bwk.tar.gz http://plan9.bell-labs.com/cm/cs/who/bwk/awk.tar.gz &&
+        mkdir -p bwk &&
+        cd bwk &&
+        gzip -cd ../bwk.tar.gz | pax -r &&
+        make CFLAGS=-D_POSIX_C_SOURCE=200112L &&
+        cp a.out ../bin/bwk
+    ;;
+    oawk)
+        wget -c -O heirloom-070715.tar.bz2 http://sourceforge.net/projects/heirloom/files/heirloom/070715/heirloom-070715.tar.bz2/download &&
+        bzip2 -cd heirloom-070715.tar.bz2 | pax -r &&
+        cd heirloom-070715 &&
+        make {libcommon,libuxre,oawk}/Makefile
+        make -C libcommon &&
+        make -C libuxre &&
+        make -C oawk &&
+        cp oawk/awk ../bin/oawk
+    ;;
+    nawk)
+        wget -c -O nawk.tar.gz http://www.cs.princeton.edu/~bwk/btl.mirror/awk.tar.gz &&
+        mkdir -p nawk &&
+        cd nawk &&
+        gzip -cd ../nawk.tar.gz | pax -r &&
+        make &&
+        cp a.out ../bin/nawk
+    ;;
+    gawk)
+        wget -c -O "gawk-$version.tar.gz" "http://ftp.gnu.org/gnu/gawk/gawk-$version.tar.gz" &&
+        gzip -cd "gawk-$version.tar.gz" | pax -r &&
+        cd "gawk-$version" &&
+        ./configure &&
+        make &&
+        cp gawk "../bin/$bin_name"
+    ;;
+    mawk)
+        wget -c -O mawk.tar.gz http://invisible-island.net/datafiles/release/mawk.tar.gz &&
+        gzip -cd mawk.tar.gz | pax -rs '|^[^/]*|mawk|' &&
+        cd mawk &&
+        ./configure &&
+        make &&
+        cp mawk ../bin/mawk
+    ;;
+esac
