@@ -15,7 +15,10 @@ fi
 
 bzip2 -cd "$kernel" | pax -r &&
 dir=${kernel##*/} dir=${dir%.tar.bz2} &&
-cp ../kernel.config "$dir/.config" &&
+case $(uname -m) in
+    x86_64) cp ../kernel64.config "$dir/.config" ;;
+    *) cp ../kernel.config "$dir/.config" ;;
+esac || exit
 cd "$dir" &&
 make silentoldconfig &&
 make &&
