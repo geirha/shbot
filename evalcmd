@@ -1,6 +1,13 @@
-#!/bin/bash
+#!/bin/bash -x
 
-output=$(./limitcmd.pl "$1" "$2" | head -c 4242 | tr -d '\r' | awk '{ do { print substr($0, 1, 120); $0 = substr($0, 121); } while(length($0)>0);  }'; exit ${PIPESTATUS[0]}; )
+t=${1:-4}
+declare -A triggers='()'
+while read -r trigger shell; do
+    triggers[$trigger]=$shell
+done < ./triggers
+[[ ${triggers[$t]} ]] || exit
+
+output=$(./limitcmd.pl "${triggers[$t]}" "$2" | head -c 4242 | tr -d '\r' | awk '{ do { print substr($0, 1, 120); $0 = substr($0, 121); } while(length($0)>0);  }'; exit ${PIPESTATUS[0]}; )
 result=$?
 lines=$(wc -l <<< "$output")
 
@@ -8,7 +15,7 @@ shopt -s extglob
 
 if [[ $output == *( ) ]] 
 then
-	if (( $result > 0 )) 
+	if (( result > 0 )) 
 	then
 		echo "no output within the time limit"
 	else
@@ -17,7 +24,7 @@ then
     exit 0
 fi
 
-if (( $lines <= 3 )); then 
+if (( lines <= 3 )); then 
     printf '%s\n' "$output"; 
     exit 0
 fi

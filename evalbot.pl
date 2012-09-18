@@ -19,7 +19,7 @@ if(!$nick)     { die "nick unspecified"; }
 if(!$password) { die "password unspecified"; }
 if(!$server)   { die "irc server unspecified"; }
 if(!$owner)    { die "owner unspecified"; }
-if($#channels == 0) { print "No channels specified. Continuing anyways\n"; }
+if(scalar @channels == 0) { print "No channels specified. Continuing anyways\n"; }
 
 $SIG{'INT'} = 'my_sigint_catcher';
 $SIG{'TERM'} = 'my_sigint_catcher';
@@ -79,29 +79,17 @@ sub message
     my( $conn, $event ) = @_;
     my( $msg ) = $event->args;
     
-    if( $msg =~/^([1-4k]|sh)?# botsnack$/ ) {
+    if( $msg =~/^# botsnack$/ ) {
         $conn->privmsg($event->to, "Core dumped.");
-    } elsif( $msg =~/^([1-4k]|sh)?# botsmack$/ ) {
+    } elsif( $msg =~/^# botsmack$/ ) {
         $conn->privmsg($event->to, "Segmentation fault");
-    } elsif( $msg =~/^([1-4]|sh)# (.*)/ ) {
-        open(FOO, "-|", "./evalcmd", "_$1", "$2");
+    } elsif( $msg =~/^([^#]*)# (.*)/ ) {
+        open(FOO, "-|", "./evalcmd", "$1", "$2");
         while(<FOO>) { 
             $conn->privmsg($event->to, $event->nick . ": $_");
         }
         close(FOO);
-    } elsif( $msg =~/^k# (.*)/ ) {
-        open(FOO, "-|", "./evalcmd", "_k93", "$1");
-        while(<FOO>) { 
-            $conn->privmsg($event->to, $event->nick . ": $_");
-        }
-        close(FOO);
-    }  elsif( $msg =~ /^# (.*)/ ) {
-         open(FOO, "-|", "./evalcmd", "_4", "$1");
-         while(<FOO>) { 
-              $conn->privmsg($event->to, $event->nick . ": $_");
-         }
-         close(FOO);
-     }
+    }
 }
 
 sub private 
@@ -113,24 +101,18 @@ sub private
 
 	 $conn->privmsg( "$owner", "< " . $event->nick . "> $msg" );
 
-     if($msg =~ /^!help.*/) {
-         $conn->privmsg( $event->nick, "Usage: 4# cmd" );
+     if($msg =~ /^!help$/) {
+         $conn->privmsg( $event->nick, "Usage: # cmd" );
 	 } elsif($msg =~ /^!raw $password (.*)/) {
 		 $conn->sl($1);
-     } elsif( $msg =~/^([1-4]|sh)# (.*)/ ) {
-         open(FOO, "-|", "./evalcmd", "_$1", "$2");
+     } elsif( $msg =~/^([^#]*)# (.*)/ ) {
+         open(FOO, "-|", "./evalcmd", "$1", "$2");
          while(<FOO>) { 
              $conn->privmsg($event->nick, "$_");
          }
          close(FOO);
-     } elsif( $msg =~/^k# (.*)/ ) {
-         open(FOO, "-|", "./evalcmd", "_k93", "$1");
-         while(<FOO>) { 
-             $conn->privmsg($event->nick, "$_");
-         }
-         close(FOO);
-     } elsif( $msg =~/^#? ?(.*)/ ) {
-         open(FOO, "-|", "./evalcmd", "_4", "$1");
+     } else {
+         open(FOO, "-|", "./evalcmd", "4", "$msg");
          while(<FOO>) { 
              $conn->privmsg($event->nick, "$_");
          }

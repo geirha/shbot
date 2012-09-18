@@ -296,19 +296,14 @@ EOF
 
 # /root/*
 cat > initramfs/root/.profile << 'EOF'
-[ -n "$BASH" ] && [ -f ~/.bashrc ] && . ~/.bashrc
-
-[ -f ~/.savestate ] && . ~/.savestate
-rm -f ~/.savestate
-EOF
-cat > initramfs/root/.savestate << 'EOF'
-printf "Ready\n" # Tells savestate it's ok to save now
 read RANDOM
 read date
 date -s "1970-01-01 + $date seconds" > /dev/null 2>&1
 printf %d "$RANDOM" > /dev/urandom
 
 unset date
+
+[ -n "$BASH" ] && [ -f ~/.bashrc ] && . ~/.bashrc
 EOF
 cat > initramfs/root/.bashrc << 'EOF'
 # Various useful options for various bash versions.
@@ -343,12 +338,12 @@ export HOME=/root
 export PATH=/bin
 cd "$HOME"
 
-case $2 in
-    _1) setsid bash1 -login ;;
-    _[234]) setsid "bash${2#_}" -l ;;
-    _k93) setsid ksh -l ;;
-    _sh) setsid sh -l ;;
-    *) setsid bash -l ;;
+printf 'Ready\n'
+read -r shell
+
+case $shell in
+    bash1) setsid bash1 -login ;;
+    *) setsid "$shell" -l ;;
 esac
 
 printf "(shell exited with %d)\n" "$?"
@@ -373,10 +368,10 @@ done
 
 # awk symlinks
 awks=( initramfs/bin/gawk?* )
-ln -s "${awks[-1]##*/}" initramfs/bin/gawk || exit
+ln -sf "${awks[-1]##*/}" initramfs/bin/gawk || exit
     
 for awk in nawk mawk gawk oawk bwk; do
     [[ -e initramfs/bin/$awk ]] || continue;
-    ln -s "$awk" initramfs/bin/awk
+    ln -sf "$awk" initramfs/bin/awk
     break
 done
