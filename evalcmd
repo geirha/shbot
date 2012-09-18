@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 t=${1:-4}
 declare -A triggers='()'

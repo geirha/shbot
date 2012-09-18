@@ -199,6 +199,7 @@ declare -A commands='(
     [bash2]="GNU Bourne-Again SHell 2.x"
     [bash3]="GNU Bourne-Again SHell 3.x"
     [bash4]="GNU Bourne-Again SHell 4.x"
+    [bash+]="GNU Bourne-Again Shell devel branch"
     [bwk]="pattern-directed scanning and processing language"
     [gawk3]="pattern scanning and processing language"
     [gawk4]="pattern scanning and processing language"

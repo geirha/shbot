@@ -2,6 +2,14 @@
 
 version=$1 bin_name=${2:-bash$version}
 
+if [[ $version = devel ]]; then
+    cd bash &&
+    ./configure &&
+    make &&
+    cp bash "../build/bin/$bin_name"
+    exit
+fi
+
 mkdir -p build/bin &&
 cd build &&
 wget -c -O "bash-$version.tar.gz" "http://ftp.gnu.org/gnu/bash/bash-$version.tar.gz" &&
