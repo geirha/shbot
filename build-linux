@@ -22,7 +22,4 @@ esac || exit
 cd "$dir" &&
 make silentoldconfig &&
 make &&
-for file in arch/*/boot/bzImage; do
-    cp "$file" ../bzImage || exit
-    break
-done
+cp arch/x86/boot/bzImage ../bzImage
