@@ -1,8 +1,10 @@
++	bash+
 1	bash1
 2	bash2
 3	bash3
 4	bash
-k	ksh
-sh	sh
 d	dash
-+	bash+
+k	ksh
+m	mksh
+mk	mksh
+sh	sh

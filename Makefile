@@ -4,7 +4,7 @@ awks = build/bin/bwk build/bin/gawk3 build/bin/gawk4 build/bin/mawk build/bin/na
 evalbot: hda
 	 
 
-initramfs.cpio.gz: $(bashes) $(awks) initramfs
+initramfs.cpio.gz: $(bashes) build/bin/mksh $(awks) initramfs
 	{ cd initramfs && pax -x sv4cpio -w .; } | gzip -9 > initramfs.cpio.gz
 
 initramfs: generate-initramfs
@@ -43,3 +43,6 @@ build/bin/nawk:
 	./build-awk nawk
 build/bin/oawk:
 	./build-awk oawk
+
+build/bin/mksh:
+	./build-mksh R40i20120901 mksh

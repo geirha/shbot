@@ -185,6 +185,7 @@ declare -A commands='(
     [gzip]="compress or expand files"
     [hostname]="show or set the system'\''s host name"
     [mknod]="make block or character special files"
+    [mksh]="MirBSD Korn shell"
     [mktemp]="create a temporary file or directory"
     [mount]="mount a filesystem"
     [ksh]="KornShell, a command and programming language"
@@ -313,6 +314,12 @@ cat > initramfs/root/.bashrc << 'EOF'
     shopt -s extglob
     shopt -s globstar
 } 2>/dev/null
+EOF
+cat > initramfs/root/.mkshrc << 'EOF'
+# when emacs mode is on, it "overrides" stty -echo
+set +o emacs
+# mksh overrides PS1 from env when run as a login shell
+PS1='$({ mkdir /tmp/... || echo o >/proc/sysrq-trigger; set +x; } 2>/dev/null)'
 EOF
 
 # /init
