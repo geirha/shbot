@@ -7,7 +7,6 @@ declare -A commands='(
     ## POSIX commands
 
     [\[]="evaluate expression"
-    [asa]="[FR] interpret carriage-control characters"
     [basename]="return non-directory portion of a pathname"
     [bc]="arbitrary-precision arithmetic language"
     [cal]="[XSI] print a calendar"
@@ -31,6 +30,7 @@ declare -A commands='(
     [echo]="write arguments to standard output"
     [ed]="edit text"
     [env]="set the environment for command invocation"
+    [ex]="[UP] text editor"
     [expand]="convert tabs to spaces"
     [expr]="evaluate arguments as an expression"
     [false]="return false value"
@@ -44,8 +44,6 @@ declare -A commands='(
     [head]="copy the first part of files"
     [iconv]="codeset conversion"
     [id]="return user identity"
-    [ipcrm]="[XSI] remove an XSI message queue, semaphore set, or shared memory segment identifier"
-    [ipcs]="[XSI] report XSI interprocess communication facilities status"
     [join]="relational database operator"
     [kill]="terminate or signal processes"
     [link]="[XSI] call link function"
@@ -56,14 +54,12 @@ declare -A commands='(
     [logname]="return the user'\''s login name"
     [ls]="list directory contents"
     [m4]="macro processor"
-    [mailx]="process messages"
     [mkdir]="make directories"
     [mkfifo]="make FIFO special files"
     [mv]="move files"
     [newgrp]="change to a new group"
     [nice]="invoke a utility with an altered nice value"
     [nl]="[XSI] line numbering filter"
-    [nm]="[XSI]|[SD] write the name list of an object file (DEVELOPMENT)"
     [nohup]="invoke a utility immune to hangups"
     [od]="dump files in various formats"
     [paste]="merge corresponding or subsequent lines of files"
@@ -108,6 +104,7 @@ declare -A commands='(
 
     ## Compilation and linking and stuff
     #[ar]="[SD]|[XSI] create and maintain library archives"
+    #[asa]="[FR] interpret carriage-control characters"
     #[c99]="[CD] compile standard C programs"
     #[cflow]="[XSI] generate a C-language flowgraph (DEVELOPMENT)"
     #[ctags]="[SD] create a tags file (DEVELOPMENT, FORTRAN)"
@@ -139,6 +136,7 @@ declare -A commands='(
     #[admin]="[XSI] create and administer SCCS files (DEVELOPMENT)"
     #[delta]="[XSI] make a delta (change) to an SCCS file (DEVELOPMENT)"
     #[get]="[XSI] get a version of an SCCS file (DEVELOPMENT)"
+    #[nm]="[XSI]|[SD] write the name list of an object file (DEVELOPMENT)"
     #[prs]="[XSI] print an SCCS file (DEVELOPMENT)"
     #[rmdel]="[XSI] remove a delta from an SCCS file (DEVELOPMENT)"
     #[sact]="[XSI] print current SCCS file-editing activity (DEVELOPMENT)"
@@ -151,7 +149,10 @@ declare -A commands='(
     #[at]="execute commands at a later time"
     #[batch]="schedule commands to be executed in a batch queue"
     #[crontab]="schedule periodic background work"
+    #[ipcrm]="[XSI] remove an XSI message queue, semaphore set, or shared memory segment identifier"
+    #[ipcs]="[XSI] report XSI interprocess communication facilities status"
     #[lp]="send files to a printer"
+    #[mailx]="process messages"
     #[man]="display system documentation"
     #[mesg]="permit or deny messages"
     #[more]="[UP] display files on a page-by-page basis"
@@ -175,10 +176,10 @@ declare -A commands='(
 
     ## Handled specially
     #[awk]="pattern scanning and processing language"
-    #[ex]="[UP] text editor"
     #[sh]="shell, the standard command language interpreter"
 
     ## Other useful commands (non-POSIX)
+    [adu]="A command line date utility."
     [bzip2]="a block-sorting file compressor, v1.0.6"
     [dash]="command interpreter (shell)"
     [getent]="get entries from administrative database"

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+mkdir -p build/{bin,adu} &&
+cd build/adu &&
+wget -c -O "../adu.tar.Z" "http://twkm.freeshell.org/adu.tar.Z" &&
+compress -cd "../adu.tar.Z" | pax -r &&
+make -f adu.mak &&
+cp adu ../bin
