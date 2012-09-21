@@ -1,2 +1,17 @@
 Shbot is an IRC bot that runs shell code. It is a fork of evalbot
 (http://www.vidarholen.net/contents/evalbot/).
+
+To build, you'll need 
+
+- Typical build tools: A C compiler, make, yacc, lex ...
+- Header files of libraries needed to build bash, awk, mksh etc.
+- Other standard and typical commands, like gzip, bzip2 and pax.
+
+For Ubuntu/Debian
+
+    sudo apt-get install build-essential pax
+    sudo apt-get build-dep bash gawk mawk mksh
+
+Should get most, if not all, build requirements down.
+
+Run make
