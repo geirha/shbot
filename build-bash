@@ -1,16 +1,26 @@
 #!/bin/bash
+shopt -s extglob
 
 version=$1 bin_name=${2:-bash$version}
 
+mkdir -p build/bin &&
 if [[ $version = devel ]]; then
+    mkdir -p build/loadables &&
     cd bash &&
     ./configure &&
     make &&
-    cp bash "../build/bin/$bin_name"
+    cp bash "../build/bin/$bin_name" &&
+    # loadable builtins
+    cd examples/loadables &&
+    make &&
+    for file in !(*.*); do
+        [[ -f $file && -x $file ]] || continue
+        cp "${file}" ../../../build/loadables
+    done
+    
     exit
 fi
 
-mkdir -p build/bin &&
 cd build &&
 wget -c -O "bash-$version.tar.gz" "http://ftp.gnu.org/gnu/bash/bash-$version.tar.gz" &&
 gzip -cd "bash-$version.tar.gz" | pax -r || exit

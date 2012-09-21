@@ -209,7 +209,7 @@ declare -A commands='(
     [oawk]="pattern scanning and processing language"
 )'
 
-mkdir -p initramfs/{bin,dev,etc,lib,root,usr/share}
+mkdir -p initramfs/{bin,dev,etc,lib,root,usr/{share,lib}}
 
 declare -A command_paths='()' lib_paths='()'
 
@@ -239,6 +239,8 @@ done
 for lib in "${!lib_paths[@]}"; do
     cp "${lib_paths[$lib]}" "initramfs/lib/$lib"
 done
+
+cp build/loadables/* initramfs/usr/lib
 
 for cmd in "${!command_paths[@]}"; do
     cp "${command_paths[$cmd]}" "initramfs/bin/$cmd"
@@ -297,6 +299,40 @@ root:x:0:0:root:/root:/bin/bash
 EOF
 
 # /root/*
+cat > initramfs/root/.load << 'EOF'
+# Enables all loadable
+enable -f basename basename
+enable -f cut cut
+enable -f dirname dirname
+enable -f finfo finfo
+enable -f getconf getconf
+enable -f head head
+enable -f id id
+enable -f ln ln
+enable -f logname logname
+enable -f mkdir mkdir
+enable -f mypid enable_mypid
+enable -f pathchk pathchk
+enable -f print print
+enable -f printenv printenv
+enable -f push push
+enable -f pushd dirs
+enable -f pushd popd
+enable -f pushd pushd
+enable -f realpath realpath
+enable -f rmdir rmdir
+enable -f sleep sleep
+enable -f strftime strftime
+enable -f sync sync
+enable -f tee tee
+enable -f truefalse false
+enable -f truefalse true
+enable -f tty tty
+enable -f uname uname
+enable -f unlink unlink
+enable -f whoami whoami
+EOF
+
 cat > initramfs/root/.profile << 'EOF'
 read RANDOM
 read date
@@ -382,4 +418,5 @@ for awk in nawk mawk gawk oawk bwk; do
     [[ -e initramfs/bin/$awk ]] || continue;
     ln -sf "$awk" initramfs/bin/awk
     break
-done
+done &&
+touch initramfs
