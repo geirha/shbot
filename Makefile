@@ -1,4 +1,4 @@
-bashes = build/bin/bash1 build/bin/bash2 build/bin/bash3 build/bin/bash4
+bashes = build/bin/bash1 build/bin/bash2 build/bin/bash3 build/bin/bash4 build/bin/bash+
 awks = build/bin/bwk build/bin/gawk3 build/bin/gawk4 build/bin/mawk build/bin/nawk build/bin/oawk
 
 evalbot: hda
@@ -30,6 +30,8 @@ build/bin/bash3:
 	./build-bash 3.2 bash3
 build/bin/bash4:
 	./build-bash 4.2 bash4
+build/bin/bash+:
+	./build-bash devel bash+
 
 build/bin/bwk:
 	./build-awk bwk
