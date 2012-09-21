@@ -7,7 +7,7 @@ while read -r trigger shell; do
 done < ./triggers
 [[ ${triggers[$t]} ]] || exit
 
-output=$(./limitcmd.pl "${triggers[$t]}" "$2" | head -c 4242 | tr -d '\r' | awk '{ do { print substr($0, 1, 120); $0 = substr($0, 121); } while(length($0)>0);  }'; exit ${PIPESTATUS[0]}; )
+output=$(./limitcmd.pl "${triggers[$t]}" "$2" | expand | head -c 4242 | tr -d '\r' | awk '{ do { print substr($0, 1, 120); $0 = substr($0, 121); } while(length($0)>0);  }'; exit ${PIPESTATUS[0]}; )
 result=$?
 lines=$(wc -l <<< "$output")
 
