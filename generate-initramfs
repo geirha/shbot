@@ -224,6 +224,9 @@ case $(uname -m) in
     ;;
 esac || exit
 
+source ./manpages  # declare -A md5s urls
+mans_updated=0
+
 for cmd in "${!commands[@]}"; do
     if ! path=$(readlink -f "$(type -P "$cmd")") 2>/dev/null; then
         printf >&2 'WARNING: not found: %s - %s\n' "$cmd" "${commands[$cmd]}"
@@ -244,11 +247,29 @@ done
 cp build/loadables/* initramfs/usr/lib
 
 for cmd in "${!command_paths[@]}"; do
-    cp "${command_paths[$cmd]}" "initramfs/bin/$cmd"
-    strip "$initramfs/bin/$cmd" 2>/dev/null
+    cp "${command_paths[$cmd]}" "initramfs/bin/$cmd" &&
+    strip "$initramfs/bin/$cmd" 2>/dev/null 
+
+    {
+        MANWIDTH=80 man -l "build/man/man1/$cmd.1" ||
+        MANWIDTH=80 man "$cmd"
+    } > man.tmp 2>/dev/null || continue
+    md5=$(openssl md5 < man.tmp)
+    md5=${md5##* }
+
+    if [[ $md5 != "${md5s[$cmd]}" ]]; then
+        printf 'Updating manual for %s\n' "$cmd" >&2
+        md5s[$cmd]=$md5
+        urls[$cmd]=$(curl -F 'sprunge=<-' http://sprunge.us < man.tmp|tr -d ' ') &&
+        mans_updated=1
+        sleep 2
+    fi
 done
 
-
+if ((mans_updated)); then
+    declare -p md5s urls > manpages.new &&
+    mv manpages{.new,}
+fi
 
 ## Some additional commands
 

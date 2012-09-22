@@ -5,4 +5,13 @@ cd build/adu &&
 wget -c -O "../adu.tar.Z" "http://twkm.freeshell.org/adu.tar.Z" &&
 compress -cd "../adu.tar.Z" | pax -r &&
 make -f adu.mak &&
-cp adu ../bin
+cp adu ../bin &&
+
+md5=$(openssl md5 < adu.txt) md5=${md5##* } &&
+source ../../manpages &&
+if [[ $md5 != "${md5s[adu]}" ]]; then
+    md5s[adu]=$md5
+    urls[adu]=$(curl -F 'sprunge=<-' http://sprunge.us < adu.txt|tr -d ' ') &&
+    declare -p md5s urls > ../../manpages.new &&
+    mv ../../manpages{.new,}
+fi

@@ -3,13 +3,14 @@ shopt -s extglob
 
 version=$1 bin_name=${2:-bash$version}
 
-mkdir -p build/bin &&
+mkdir -p build/{bin,man/man1} &&
 if [[ $version = devel ]]; then
     mkdir -p build/loadables &&
     cd bash &&
     ./configure &&
     make &&
     cp bash "../build/bin/$bin_name" &&
+    cp doc/bash.1 "../build/man/man1/$bin_name.1" &&
     # loadable builtins
     cd examples/loadables &&
     make &&
@@ -116,4 +117,5 @@ fi
 
 ./configure "${configure_opts[@]}" &&
 make &&
-cp bash "../bin/$bin_name"
+cp bash "../bin/$bin_name" &&
+cp doc?(umentation)/bash.1 "../man/man1/$bin_name.1"

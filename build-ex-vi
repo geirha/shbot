@@ -1,9 +1,10 @@
 #!/bin/bash
 
-mkdir -p build/bin &&
+mkdir -p build/{bin,man/man1} &&
 cd build &&
 wget -c -O ex-vi.tar.bz2 "http://sourceforge.net/projects/ex-vi/files/latest/download" &&
 bzip2 -cd ex-vi.tar.bz2 | pax -rs ',[^/]*,ex-vi,' &&
 cd ex-vi &&
 make &&
-cp ex ../bin
+cp ex ../bin &&
+cp ex.1 ../man/man1/ex.1

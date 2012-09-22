@@ -2,7 +2,7 @@
 
 awk=$1 version=$2 bin_name=${3:-$1$2}
 
-mkdir -p build/bin &&
+mkdir -p build/{bin,man/man1} &&
 cd build &&
 case $awk in
     bwk)
@@ -11,7 +11,8 @@ case $awk in
         cd bwk &&
         gzip -cd ../bwk.tar.gz | pax -r &&
         make CFLAGS=-D_POSIX_C_SOURCE=200112L &&
-        cp a.out ../bin/bwk
+        cp a.out ../bin/bwk &&
+        cp awk.1 ../man/man1/bwk.1
     ;;
     oawk)
         wget -c -O heirloom-070715.tar.bz2 http://sourceforge.net/projects/heirloom/files/heirloom/070715/heirloom-070715.tar.bz2/download &&
@@ -21,7 +22,8 @@ case $awk in
         make -C libcommon &&
         make -C libuxre &&
         make -C oawk &&
-        cp oawk/awk ../bin/oawk
+        cp oawk/awk ../bin/oawk &&
+        cp oawk/oawk.1 ../man/man1/oawk.1
     ;;
     nawk)
         wget -c -O nawk.tar.gz http://www.cs.princeton.edu/~bwk/btl.mirror/awk.tar.gz &&
@@ -29,7 +31,8 @@ case $awk in
         cd nawk &&
         gzip -cd ../nawk.tar.gz | pax -r &&
         make &&
-        cp a.out ../bin/nawk
+        cp a.out ../bin/nawk &&
+        cp awk.1 ../man/man1/nawk.1
     ;;
     gawk)
         wget -c -O "gawk-$version.tar.gz" "http://ftp.gnu.org/gnu/gawk/gawk-$version.tar.gz" &&
@@ -37,7 +40,8 @@ case $awk in
         cd "gawk-$version" &&
         ./configure &&
         make &&
-        cp gawk "../bin/$bin_name"
+        cp gawk "../bin/$bin_name" &&
+        cp doc/gawk.1 "../man/man1/$bin_name.1"
     ;;
     mawk)
         wget -c -O mawk.tar.gz http://invisible-island.net/datafiles/release/mawk.tar.gz &&
@@ -45,6 +49,7 @@ case $awk in
         cd mawk &&
         ./configure &&
         make &&
-        cp mawk ../bin/mawk
+        cp mawk ../bin/mawk &&
+        cp man/mawk.1 ../man/man1/mawk.1
     ;;
 esac
