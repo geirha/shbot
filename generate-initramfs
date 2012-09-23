@@ -225,7 +225,6 @@ case $(uname -m) in
 esac || exit
 
 source ./manpages  # declare -A md5s urls
-mans_updated=0
 
 for cmd in "${!commands[@]}"; do
     if ! path=$(readlink -f "$(type -P "$cmd")") 2>/dev/null; then
@@ -261,15 +260,11 @@ for cmd in "${!command_paths[@]}"; do
         printf 'Updating manual for %s\n' "$cmd" >&2
         md5s[$cmd]=$md5
         urls[$cmd]=$(curl -F 'sprunge=<-' http://sprunge.us < man.tmp|tr -d ' ') &&
-        mans_updated=1
+        declare -p md5s urls > manpages.new &&
+        mv manpages{.new,}
         sleep 2
     fi
 done
-
-if ((mans_updated)); then
-    declare -p md5s urls > manpages.new &&
-    mv manpages{.new,}
-fi
 
 ## Some additional commands
 
