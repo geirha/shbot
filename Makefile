@@ -1,10 +1,14 @@
-bashes = build/bin/bash1 build/bin/bash2 build/bin/bash3 build/bin/bash4 build/bin/bash+
-awks = build/bin/bwk build/bin/gawk3 build/bin/gawk4 build/bin/mawk build/bin/nawk build/bin/oawk
+.PHONY: clean
+
+shells = build/bin/bash1 build/bin/bash2 build/bin/bash3 \
+         build/bin/bash4 build/bin/bash+ build/bin/mksh build/bin/bsh
+awks = build/bin/bwk build/bin/gawk3 build/bin/gawk4 build/bin/mawk \
+       build/bin/nawk build/bin/oawk
 
 evalbot: hda
 	 
 
-initramfs.cpio.gz: $(bashes) build/bin/mksh $(awks) build/bin/adu build/bin/ex initramfs
+initramfs.cpio.gz: $(shells) $(awks) build/bin/adu build/bin/ex initramfs
 	{ cd initramfs && pax -x sv4cpio -w .; } | gzip -9 > initramfs.cpio.gz
 
 initramfs: generate-initramfs
@@ -23,15 +27,19 @@ clean:
 	rm -f initramfs.cpio.gz hda hda.tmp fifo *~
 
 build/bin/bash1:
-	./build-bash 1.14.7 bash1
+	./build-shell bash 1.14.7 bash1
 build/bin/bash2:
-	./build-bash 2.05b bash2
+	./build-shell bash 2.05b bash2
 build/bin/bash3:
-	./build-bash 3.2 bash3
+	./build-shell bash 3.2 bash3
 build/bin/bash4:
-	./build-bash 4.2 bash4
+	./build-shell bash 4.2 bash4
 build/bin/bash+:
-	./build-bash devel bash+
+	./build-shell bash devel bash+
+build/bin/bsh:
+	./build-shell bourne 050706 bsh
+build/bin/mksh:
+	./build-shell mksh R40i20120901 mksh
 
 build/bin/bwk:
 	./build-awk bwk
@@ -45,9 +53,6 @@ build/bin/nawk:
 	./build-awk nawk
 build/bin/oawk:
 	./build-awk oawk
-
-build/bin/mksh:
-	./build-mksh R40i20120901 mksh
 
 build/bin/adu:
 	./build-adu

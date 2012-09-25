@@ -202,6 +202,7 @@ declare -A commands='(
     [bash3]="GNU Bourne-Again SHell 3.x"
     [bash4]="GNU Bourne-Again SHell 4.x"
     [bash+]="GNU Bourne-Again Shell devel branch"
+    [bsh]="the standard command interpreter"
     [bwk]="pattern-directed scanning and processing language"
     [gawk3]="pattern scanning and processing language"
     [gawk4]="pattern scanning and processing language"
@@ -404,6 +405,7 @@ read -r shell
 
 case $shell in
     bash1) setsid bash1 -login ;;
+    [bj]sh) PS1='' TIMEOUT=1 setsid exec -a "-$shell" "$shell" ;;
     *) setsid "$shell" -l ;;
 esac
 
@@ -417,6 +419,8 @@ shopt -s nullglob
 bashes=( initramfs/bin/bash[1-4] )
 ln -sf "${bashes[-1]##*/}" initramfs/bin/bash || exit
 
+# jsh, bourne shell with job control
+ln -sf bsh initramfs/bin/jsh
 
 # decide on a /bin/sh
 for shell in initramfs/bin/{dash,ksh,bash}; do

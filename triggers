@@ -3,7 +3,9 @@
 2	bash2
 3	bash3
 4	bash
+b	jsh
 d	dash
+j	jsh
 k	ksh
 m	mksh
 mk	mksh
