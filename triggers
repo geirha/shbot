@@ -1,12 +1,12 @@
-+	bash+
-1	bash1
-2	bash2
-3	bash3
-4	bash
-b	jsh
-d	dash
-j	jsh
-k	ksh
-m	mksh
-mk	mksh
-sh	sh
++	setsid bash+ -l
+1	setsid bash1 -login
+2	setsid bash2 -l
+3	setsid bash3 -l
+4	setsid bash -l
+b	PS1= TIMEOUT=1 exec -l bsh -i
+d	setsid dash -l
+j	PS1= TIMEOUT=1 exec -l jsh -i
+k	setsid ksh -l
+m	setsid mksh -l
+mk	setsid mksh -l
+sh	setsid sh -l

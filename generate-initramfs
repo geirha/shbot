@@ -394,12 +394,13 @@ cat > initramfs/root/.mkshrc << 'EOF'
 # when emacs mode is on, it "overrides" stty -echo
 set +o emacs
 # mksh overrides PS1 from env when run as a login shell
-PS1='$({ mkdir /tmp/... || echo o >/proc/sysrq-trigger; set +x; } 2>/dev/null)'
+PS1='$({ print -n ${_x+o}>/proc/sysrq-trigger;set +x; } 2>/dev/null)${_x=}'
 EOF
 
 # /init
 cat > initramfs/init << 'EOF'
 #!/bin/bash
+shopt -s extglob
 chown -R root:root /
 mknod -m 660 /dev/ttyS0 c 4 64
 mknod -m 666 /dev/null c 1 3
@@ -415,20 +416,17 @@ chmod 1777 /tmp
 mount -t proc none /proc 
 
 stty -echo
-export PS1='$({ mkdir /tmp/... || printf o >/proc/sysrq-trigger; set +x; } 2>/dev/null)'
-export PS2="Missing terminating quote, bracket or keyword"
-export HOME=/root
-export PATH=/bin
+PS1='$({ echo ${_x+o}>/proc/sysrq-trigger;set +x; } 2>/dev/null)${_x=}'
+PS2="Missing terminating quote, bracket or keyword"
+HOME=/root
+PATH=/bin
+export PS1 PS2 HOME PATH
 cd "$HOME"
 
 printf 'Ready\n'
 read -r shell
 
-case $shell in
-    bash1) setsid bash1 -login ;;
-    [bj]sh) PS1='' TIMEOUT=1 setsid exec -a "-$shell" "$shell" ;;
-    *) setsid "$shell" -l ;;
-esac
+eval "$shell"
 
 printf "(shell exited with %d)\n" "$?"
 printf o > /proc/sysrq-trigger
