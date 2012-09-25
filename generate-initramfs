@@ -138,7 +138,6 @@ declare -A commands='(
     [wc]="word, line, and byte or character count"
     [who]="display who is on the system"
     [xargs]="construct argument lists and invoke utility"
-    [zcat]="[XSI] expand and concatenate data"
 
     ## Compilation and linking and stuff
     #[ar]="[SD]|[XSI] create and maintain library archives"
@@ -215,6 +214,7 @@ declare -A commands='(
     ## Handled specially
     #[awk]="pattern scanning and processing language"
     #[sh]="shell, the standard command language interpreter"
+    #[zcat]="[XSI] expand and concatenate data"
 
     ## Other useful commands (non-POSIX)
     [adu]="A command line date utility."
