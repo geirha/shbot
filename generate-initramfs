@@ -1,6 +1,44 @@
 #!/bin/bash
 
 PATH=$PWD/build/bin:$PATH
+usage() { cat << EOF
+Usage: ./generate-initramfs [-mh]
+
+    -h, --help   Display this help
+    -m           Update manpages
+EOF
+}
+sprunge() { curl -F 'sprunge=<-' http://sprunge.us; }
+update_manpage() {
+    local cmd=$1 md5
+    ((update_manpages)) || return 0
+    {
+        MANWIDTH=80 man -l "build/man/man1/$cmd.1" ||
+        MANWIDTH=80 man "$cmd"
+    } > man.tmp 2>/dev/null || continue
+    md5=$(openssl md5 < man.tmp)
+    md5=${md5##* }
+
+    if [[ $md5 != "${md5s[$cmd]}" ]]; then
+        printf 'Updating manual for %s\n' "$cmd" >&2
+        md5s[$cmd]=$md5
+        urls[$cmd]=$(sprunge < man.tmp|tr -d ' ') &&
+        declare -p md5s urls > manpages.new &&
+        mv manpages{.new,}
+        sleep 2
+    fi
+}
+
+update_manpages=
+
+while (($#)); do
+    case $1 in
+        -h|--help) usage; exit ;;
+        -m) update_manpages=1; source ./manpages;;
+         *) usage; exit 1 ;;
+    esac
+    shift
+done
 
 declare -A commands='(
 
@@ -225,8 +263,6 @@ case $(uname -m) in
     ;;
 esac || exit
 
-source ./manpages  # declare -A md5s urls
-
 for cmd in "${!commands[@]}"; do
     if ! path=$(readlink -f "$(type -P "$cmd")") 2>/dev/null; then
         printf >&2 'WARNING: not found: %s - %s\n' "$cmd" "${commands[$cmd]}"
@@ -249,22 +285,7 @@ cp build/loadables/* initramfs/usr/lib
 for cmd in "${!command_paths[@]}"; do
     cp "${command_paths[$cmd]}" "initramfs/bin/$cmd" &&
     strip "$initramfs/bin/$cmd" 2>/dev/null 
-
-    {
-        MANWIDTH=80 man -l "build/man/man1/$cmd.1" ||
-        MANWIDTH=80 man "$cmd"
-    } > man.tmp 2>/dev/null || continue
-    md5=$(openssl md5 < man.tmp)
-    md5=${md5##* }
-
-    if [[ $md5 != "${md5s[$cmd]}" ]]; then
-        printf 'Updating manual for %s\n' "$cmd" >&2
-        md5s[$cmd]=$md5
-        urls[$cmd]=$(curl -F 'sprunge=<-' http://sprunge.us < man.tmp|tr -d ' ') &&
-        declare -p md5s urls > manpages.new &&
-        mv manpages{.new,}
-        sleep 2
-    fi
+    update_manpage "$cmd"
 done
 
 ## Some additional commands
