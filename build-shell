@@ -122,8 +122,8 @@ EOF
         cd build &&
         wget -c -O "bash-$version.tar.gz" "http://ftp.gnu.org/gnu/bash/bash-$version.tar.gz" &&
         gzip -cd "bash-$version.tar.gz" | pax -r &&
-        cd "bash-$version" &&
         wget -r --level=1 -A 'bash*-[0-9][0-9][0-9]' -nH --cut-dirs=2 "http://ftp.gnu.org/gnu/bash/bash-$version-patches/" &&
+        cd "bash-$version" &&
         cat "../bash-$version-patches"/bash*-[0-9][0-9][0-9] | patch -p0 || exit
         ./configure --without-bash-malloc &&  # bash2's malloc doesn't build
         make &&
@@ -134,8 +134,8 @@ EOF
         cd build &&
         wget -c -O "bash-$version.tar.gz" "http://ftp.gnu.org/gnu/bash/bash-$version.tar.gz" &&
         gzip -cd "bash-$version.tar.gz" | pax -r &&
-        cd "bash-$version" &&
         wget -r --level=1 -A 'bash*-[0-9][0-9][0-9]' -nH --cut-dirs=2 "http://ftp.gnu.org/gnu/bash/bash-$version-patches/" &&
+        cd "bash-$version" &&
         cat "../bash-$version-patches"/bash*-[0-9][0-9][0-9] | patch -p0 || exit
         ./configure &&
         make &&
