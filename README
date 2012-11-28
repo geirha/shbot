@@ -7,6 +7,11 @@ To build, you'll need
 - Header files of libraries needed to build bash, awk, mksh etc.
 - Other standard and typical commands, like gzip, bzip2 and pax.
 
+To grab the latest bash development branch from Git so it can be built
+
+    git submodule init && git submodule update && cd bash && \
+    git checkout devel
+
 For Ubuntu/Debian
 
     sudo apt-get install build-essential pax ncompress
