@@ -4,10 +4,10 @@ $nick="shbot";
 # The IRC server
 $server="irc.freenode.net";
 
-# The owner's nick. Evalbot will flood this nick with private messages. 
+# The owner's nick. Evalbot will flood this nick with private messages.
 $owner="";
 
-# The passwords for !raw 
+# The passwords for !raw
 $password="";
 
 # The password for nickserv (if registered)

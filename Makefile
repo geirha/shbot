@@ -22,7 +22,7 @@ hda: initramfs.cpio.gz build/bzImage
 	./savestate hda.tmp save
 	mv hda.tmp hda
 
-clean: 
+clean:
 	rm -rf build/ initramfs/
 	rm -f initramfs.cpio.gz hda hda.tmp fifo *~
 

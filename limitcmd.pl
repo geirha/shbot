@@ -21,7 +21,7 @@ foreach my $sig (@signals) {
 }
 
 alarm 4;
-while (($pid = wait) != -1 && $pid != $child) {} 
+while (($pid = wait) != -1 && $pid != $child) {}
 exit $?
 #exit ($pid == $child_pid ? 0 : 1);
 

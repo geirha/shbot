@@ -284,7 +284,7 @@ cp build/loadables/* initramfs/usr/lib
 
 for cmd in "${!command_paths[@]}"; do
     cp "${command_paths[$cmd]}" "initramfs/bin/$cmd" &&
-    strip "$initramfs/bin/$cmd" 2>/dev/null 
+    strip "$initramfs/bin/$cmd" 2>/dev/null
     update_manpage "$cmd"
 done
 
@@ -413,7 +413,7 @@ ln -sf ttyS0 /dev/tty
 hostname bunnies
 mkdir -p /proc /tmp
 chmod 1777 /tmp
-mount -t proc none /proc 
+mount -t proc none /proc
 
 stty -echo
 PS1='$({ echo ${_x+o}>/proc/sysrq-trigger;set +x; } 2>/dev/null)${_x=}'
@@ -453,7 +453,7 @@ done
 # awk symlinks
 #awks=( initramfs/bin/gawk?* )
 ln -sf gawk4 initramfs/bin/gawk || exit
-    
+
 for awk in nawk mawk gawk oawk bwk; do
     [[ -e initramfs/bin/$awk ]] || continue;
     ln -sf "$awk" initramfs/bin/awk

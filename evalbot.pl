@@ -26,7 +26,7 @@ $SIG{'TERM'} = 'my_sigint_catcher';
 $SIG{'QUIT'} = 'my_sigint_catcher';
 $SIG{'ALRM'} = 'my_alarm';
 sub my_sigint_catcher {
-   exit(1); 
+   exit(1);
 }
 
 
@@ -40,7 +40,7 @@ my $conn = $irc->newconn( Server => "$server",
 my $joined=0;
 
 sub join_channels {
-    foreach (@channels) {   
+    foreach (@channels) {
 	$conn->join( "$_" );
     }
     $joined=1;
@@ -78,26 +78,26 @@ sub message
 {
     my( $conn, $event ) = @_;
     my( $msg ) = $event->args;
-    
+
     if( $msg =~/^# botsnack$/ ) {
         $conn->privmsg($event->to, "Core dumped.");
     } elsif( $msg =~/^# botsmack$/ ) {
         $conn->privmsg($event->to, "Segmentation fault");
     } elsif( $msg =~/^([^#]*)# (.*)/ ) {
         open(FOO, "-|", "./evalcmd", "$1", "$2");
-        while(<FOO>) { 
+        while(<FOO>) {
             $conn->privmsg($event->to, $event->nick . ": $_");
         }
         close(FOO);
     }
 }
 
-sub private 
+sub private
 {
     my( $conn, $event ) = @_;
-    my( $msg ) = $event->args;  
+    my( $msg ) = $event->args;
 
-     if($event->nick =~ /^$nick$/) { return; } #lol 
+     if($event->nick =~ /^$nick$/) { return; } #lol
 
 	 $conn->privmsg( "$owner", "< " . $event->nick . "> $msg" );
 
@@ -107,13 +107,13 @@ sub private
 		 $conn->sl($1);
      } elsif( $msg =~/^([^#]*)# (.*)/ ) {
          open(FOO, "-|", "./evalcmd", "$1", "$2");
-         while(<FOO>) { 
+         while(<FOO>) {
              $conn->privmsg($event->nick, "$_");
          }
          close(FOO);
      } else {
          open(FOO, "-|", "./evalcmd", "4", "$msg");
-         while(<FOO>) { 
+         while(<FOO>) {
              $conn->privmsg($event->nick, "$_");
          }
          close(FOO);
@@ -123,7 +123,7 @@ sub private
 sub notice
 {
     my( $conn, $event ) = @_;
-    my( $msg ) = $event->args;  
+    my( $msg ) = $event->args;
     if ( $event->nick eq "NickServ" ) {
 	if($joined==0) {
 	    if($nickserv) {
