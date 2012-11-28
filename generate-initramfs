@@ -435,8 +435,8 @@ chmod 750 initramfs/init
 
 shopt -s nullglob
 # decide on a /bin/bash
-bashes=( initramfs/bin/bash[1-4] )
-ln -sf "${bashes[-1]##*/}" initramfs/bin/bash || exit
+#bashes=( initramfs/bin/bash[1-4] )
+ln -sf bash4 initramfs/bin/bash || exit
 
 # jsh, bourne shell with job control
 ln -sf bsh initramfs/bin/jsh
@@ -451,8 +451,8 @@ done
 [[ -e initramfs/bin/sh ]] || exit
 
 # awk symlinks
-awks=( initramfs/bin/gawk?* )
-ln -sf "${awks[-1]##*/}" initramfs/bin/gawk || exit
+#awks=( initramfs/bin/gawk?* )
+ln -sf gawk4 initramfs/bin/gawk || exit
     
 for awk in nawk mawk gawk oawk bwk; do
     [[ -e initramfs/bin/$awk ]] || continue;
