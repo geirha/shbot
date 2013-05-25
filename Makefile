@@ -29,6 +29,9 @@ clean:
 build/bash-%:
 	./extract-from-git "$@"
 
+build/mksh:
+	cd build && env CVS_RSH=ssh cvs -qd _anoncvs@anoncvs.mirbsd.org:/cvs co -PA mksh
+
 build/bin/bash1: build/bash-1.14.7
 	./build-shell bash 1.14.7 bash1
 build/bin/bash2: build/bash-2.05b
@@ -41,8 +44,8 @@ build/bin/bash+: build/bash-devel
 	./build-shell bash devel bash+
 build/bin/bsh:
 	./build-shell bourne 050706 bsh
-build/bin/mksh:
-	./build-shell mksh R40i20120901 mksh
+build/bin/mksh: build/mksh
+	./build-shell mksh
 
 build/bin/bwk:
 	./build-awk bwk

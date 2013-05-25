@@ -7,14 +7,12 @@ mkdir -p build/{bin,man/man1} || exit
 
 case $shell in
     mksh)
-        cd build &&
-        wget -c -O "mksh-$version.tgz" "https://www.mirbsd.org/MirOS/dist/mir/mksh/snapshot/mksh-$version.tgz" &&
-
-        gzip -cd "mksh-$version.tgz" | pax -r &&
-        cd mksh &&
+        cd build/mksh &&
+        cvs update &&
         sh Build.sh &&
         cp mksh "../bin/$bin_name" &&
         cp mksh.1 "../man/man1/$bin_name.1"
+        exit
     ;;
     bourne)
         cd build &&
@@ -24,6 +22,7 @@ case $shell in
         make &&
         cp sh ../bin/$bin_name &&
         cp sh.1 ../man/man1/$bin_name.1
+        exit
     ;;
     bash) : ;; #handled below
     *) exit 1;;
@@ -54,6 +53,7 @@ case $version in
     ;;
     *)
         cd "build/bash-$version" &&
+        rm -f y.tab.[co] &&
         ./configure &&
         make &&
         cp bash "../bin/$bin_name" &&
