@@ -1,0 +1,11 @@
+diff -ru a/makefile b/makefile
+--- a/makefile	2012-12-20 14:58:45.000000000 +0100
++++ b/makefile	2013-05-25 21:58:02.968859802 +0200
+@@ -32,7 +32,6 @@
+ CC = gcc -O4 -Wall -pedantic -fno-strict-aliasing
+ 
+ YACC = bison -d -y
+-YACC = yacc -d -S
+ #YFLAGS = -d -S
+ 		# -S uses sprintf in yacc parser instead of sprint
+ 

@@ -29,7 +29,10 @@ case $awk in
         wget -c -O nawk.tar.gz http://www.cs.princeton.edu/~bwk/btl.mirror/awk.tar.gz &&
         mkdir -p nawk &&
         cd nawk &&
-        gzip -cd ../nawk.tar.gz | pax -r &&
+        gzip -cd ../nawk.tar.gz | pax -r || exit
+        if [[ -f ../../patches/$awk ]]; then
+            patch -p1 < "../../patches/$awk" || exit
+        fi
         make &&
         cp a.out ../bin/nawk &&
         cp awk.1 ../man/man1/nawk.1
