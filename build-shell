@@ -33,17 +33,17 @@ esac
 case $version in
     devel)
         mkdir -p build/loadables &&
-        cd bash &&
+        cd build/bash-devel &&
         ./configure &&
         make &&
-        cp bash "../build/bin/$bin_name" &&
-        cp doc/bash.1 "../build/man/man1/$bin_name.1" &&
+        cp bash "../bin/$bin_name" &&
+        cp doc/bash.1 "../man/man1/$bin_name.1" &&
         # loadable builtins
         cd examples/loadables &&
         make &&
         for file in !(*.*); do
             [[ -f $file && -x $file ]] || continue
-            cp "${file}" ../../../build/loadables
+            cp "${file}" ../../../loadables
         done
     ;;
     1.14.7)

@@ -35,8 +35,8 @@ build/bin/bash2: build/bash-2.05b
 	./build-shell bash 2.05b bash2
 build/bin/bash3: build/bash-3.2.48
 	./build-shell bash 3.2.48 bash3
-build/bin/bash4: build/bash-4.2.42
-	./build-shell bash 4.2.42 bash4
+build/bin/bash4: build/bash-4.2.45
+	./build-shell bash 4.2.45 bash4
 build/bin/bash+: build/bash-devel
 	./build-shell bash devel bash+
 build/bin/bsh:

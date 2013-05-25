@@ -7,7 +7,7 @@ declare -A versions='(
     [bash-1.14.7]=726f63884db0132f01745f1fb4465e6621088ccf
     [bash-2.05b]=7117c2d221b2aed4ede8600f6a36b7c1454b4f55
     [bash-3.2.48]=f1be666c7d78939ad775078d290bec2758fa29a2
-    [bash-4.2.42]=509a4430ae72aec10896713435e84f5b27675763
+    [bash-4.2.45]=f281b8f4f8936b2713966274d9f8508a9f0910e4
     [bash-devel]=devel
 )'
 
