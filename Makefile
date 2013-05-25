@@ -26,15 +26,18 @@ clean:
 	rm -rf build/ initramfs/
 	rm -f initramfs.cpio.gz hda hda.tmp fifo *~
 
-build/bin/bash1:
+build/bash-%:
+	./extract-from-git "$@"
+
+build/bin/bash1: build/bash-1.14.7
 	./build-shell bash 1.14.7 bash1
-build/bin/bash2:
+build/bin/bash2: build/bash-2.05b
 	./build-shell bash 2.05b bash2
-build/bin/bash3:
-	./build-shell bash 3.2 bash3
-build/bin/bash4:
-	./build-shell bash 4.2 bash4
-build/bin/bash+:
+build/bin/bash3: build/bash-3.2.48
+	./build-shell bash 3.2.48 bash3
+build/bin/bash4: build/bash-4.2.42
+	./build-shell bash 4.2.42 bash4
+build/bin/bash+: build/bash-devel
 	./build-shell bash devel bash+
 build/bin/bsh:
 	./build-shell bourne 050706 bsh

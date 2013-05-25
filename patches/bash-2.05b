@@ -1,0 +1,24 @@
+From 5089f668465e0d6f1fdc075ddc95bb758ae98230 Mon Sep 17 00:00:00 2001
+From: Geir Hauge <geir.hauge@gmail.com>
+Date: Sat, 25 May 2013 14:54:19 +0200
+Subject: [PATCH] Fix a build error
+
+---
+ lib/malloc/malloc.c |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/malloc/malloc.c b/lib/malloc/malloc.c
+index 0b4c847..190cccd 100644
+--- a/lib/malloc/malloc.c
++++ b/lib/malloc/malloc.c
+@@ -879,6 +879,7 @@ internal_free (mem, file, line, flags)
+   busy[nunits] = 0;
+ 
+ free_return:
++  ;            /* Empty statement in case this is the end of the function */
+ 
+ #ifdef MALLOC_STATS
+   _mstats.nmalloc[nunits]--;
+-- 
+1.7.10.4
+

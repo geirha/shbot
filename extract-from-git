@@ -1,0 +1,26 @@
+#!/bin/bash
+# usage: extract-from-git build/bash-x.y.z
+
+die() { local ret=$?; printf '%s\n' "$@" >&2; exit "$ret"; }
+
+declare -A versions='(
+    [bash-1.14.7]=726f63884db0132f01745f1fb4465e6621088ccf
+    [bash-2.05b]=7117c2d221b2aed4ede8600f6a36b7c1454b4f55
+    [bash-3.2.48]=f1be666c7d78939ad775078d290bec2758fa29a2
+    [bash-4.2.42]=509a4430ae72aec10896713435e84f5b27675763
+    [bash-devel]=devel
+)'
+
+base=${1##*/}
+
+[[ ${versions[$base]} ]] || die "Unkown version: $base"
+
+mkdir -p "$1" || exit 
+{
+    cd bash && 
+    git archive --prefix="$1/" --format=tar "${versions[$base]}"
+} | pax -r
+
+if [[ -f patches/$base ]]; then
+    { cd "$1" && patch -p1; } < "patches/$base"
+fi

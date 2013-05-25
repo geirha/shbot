@@ -1,0 +1,77 @@
+From 827c8f6a0745d6cba9587454155f4d2b17131177 Mon Sep 17 00:00:00 2001
+From: Geir Hauge <geir.hauge@gmail.com>
+Date: Sat, 25 May 2013 14:36:25 +0200
+Subject: [PATCH] Support for building on linux x86_64, and remove some
+ deprecated code
+
+---
+ machines.h           |   28 ++++++++++++++++++++++++++--
+ support/getcppsyms.c |    6 ++++++
+ 2 files changed, 32 insertions(+), 2 deletions(-)
+
+diff --git a/machines.h b/machines.h
+index 7fe1ff9..3865af8 100644
+--- a/machines.h
++++ b/machines.h
+@@ -76,6 +76,32 @@
+ #define MACHINE_CFLAGS
+ 
+ /* **************************************************************** */
++/*                                                                  */
++/*                      x86 64-bit machines                         */
++/*                                                                  */
++/* **************************************************************** */
++
++#if defined (__x86_64__) && defined (__linux__)
++#  define M_MACHINE "x86_64"
++#  define M_OS "Linux"
++#  define SYSDEP_CFLAGS -DHAVE_GETDTABLESIZE -DHAVE_BCOPY \
++			-DHAVE_GETPW_DECLS -DHAVE_GETHOSTNAME
++#  define REQUIRED_LIBRARIES
++#  define HAVE_GETGROUPS
++#  define HAVE_STRERROR
++#  define VOID_SIGHANDLER
++#  define HAVE_SYS_SIGLIST
++#  define SEARCH_LIB_NEEDS_SPACE
++#  if defined (__GNUC__)
++#    define HAVE_FIXED_INCLUDES
++#  endif /* __GNUC__ */
++#  undef USE_GNU_MALLOC
++#  undef HAVE_SETLINEBUF
++#  undef HAVE_GETWD
++#endif  /* __x86_64__ && __linux__ */
++
++
++/* **************************************************************** */
+ /*								    */
+ /*			Sun Microsystems Machines	      	    */
+ /*								    */
+@@ -889,8 +915,6 @@
+ #    define HAVE_STRERROR
+ #    define VOID_SIGHANDLER
+ #    define HAVE_SYS_SIGLIST
+-#    define HAVE_VFPRINTF
+-#    define HAVE_VARARGS_H
+ #    define SEARCH_LIB_NEEDS_SPACE
+ #    if defined (__GNUC__)
+ #      define HAVE_FIXED_INCLUDES
+diff --git a/support/getcppsyms.c b/support/getcppsyms.c
+index eb4c72d..0749417 100644
+--- a/support/getcppsyms.c
++++ b/support/getcppsyms.c
+@@ -422,6 +422,12 @@ main ()
+ #if defined (vax)
+   printf (" -Dvax");
+ #endif /* vax */
++#if defined (__x86_64)
++  printf (" -D__x86_64");
++#endif /* __x86_64 */
++#if defined (__x86_64__)
++  printf (" -D__x86_64__");
++#endif /* __x86_64__ */
+ 
+   printf ("\n");
+   exit (0);
+-- 
+1.7.10.4
+
