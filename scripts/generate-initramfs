@@ -10,7 +10,7 @@ EOF
 }
 sprunge() { curl -F 'sprunge=<-' http://sprunge.us; }
 update_manpage() {
-    local cmd=$1 md5
+    local cmd=$1 md5 cur_md5
     ((update_manpages)) || return 0
     {
         MANWIDTH=80 man -l "build/man/man1/$cmd.1" ||
@@ -26,6 +26,18 @@ update_manpage() {
         declare -p md5s urls > manpages.new &&
         mv manpages{.new,}
         sleep 2
+    else
+        curl -s "${urls[$cmd]}" | sed '$d' > man2.tmp || return
+        cur_md5=$(openssl md5 < man2.tmp)
+        cur_md5=${cur_md5##* }
+        if [[ $cur_md5 != "${md5s[$cmd]}" ]]; then
+            printf 'Updating manual for %s\n' "$cmd" >&2
+            md5s[$cmd]=$md5
+            urls[$cmd]=$(sprunge < man.tmp|tr -d ' ') &&
+            declare -p md5s urls > manpages.new &&
+            mv manpages{.new,}
+            sleep 2
+        fi
     fi
 }
 
@@ -223,11 +235,12 @@ declare -A commands='(
     [getent]="get entries from administrative database"
     [gzip]="compress or expand files"
     [hostname]="show or set the system'\''s host name"
+    [ksh]="KornShell, a command and programming language"
     [mknod]="make block or character special files"
     [mksh]="MirBSD Korn shell"
     [mktemp]="create a temporary file or directory"
     [mount]="mount a filesystem"
-    [ksh]="KornShell, a command and programming language"
+    #[openssl]="OpenSSL command line tool"
     [recode]="converts files between character sets"
     [setsid]="run a program in a new session"
     [strace]="trace system calls and signals"
@@ -253,9 +266,11 @@ mkdir -p initramfs/{bin,dev,etc,lib,root,usr/{share,lib}}
 
 declare -A command_paths='()' lib_paths='()'
 
+enable -f build/loadables/realpath realpath || exit
+
 case $(uname -m) in
     x86_64)
-        mkdir -p initramfs/lib64 &&
+        ln -s lib initramfs/lib64 &&
         cp /lib64/ld-linux-x86-64.so.2 initramfs/lib64/
     ;;
     *)
@@ -264,7 +279,7 @@ case $(uname -m) in
 esac || exit
 
 for cmd in "${!commands[@]}"; do
-    if ! path=$(readlink -f "$(type -P "$cmd")") 2>/dev/null; then
+    if ! path=$(realpath "$(type -P "$cmd")") 2>/dev/null; then
         printf >&2 'WARNING: not found: %s - %s\n' "$cmd" "${commands[$cmd]}"
         continue
     fi
