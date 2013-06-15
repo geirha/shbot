@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ $1 = -n ]]; then
+    nopaste=1
+    shift
+fi
 t=${1:-4}
 declare -A triggers='()'
 while read -r trigger shell; do
@@ -32,20 +36,23 @@ then
     exit 0
 fi
 
-if (( lines <= 3 )); then
-    printf '%s\n' "$output";
-    exit 0
-fi
-
-read -r url < <(./paste <<< "$output")
-if [[ -n $url ]]
-then
-    etc="etc... ( $url )"
+if ((nopaste)); then
+    printf '%s\n' "$output"
 else
-    etc="and so forth... (but now the pastebin is sick of me)"
+    if (( lines <= 3 )); then
+        printf '%s\n' "$output";
+        exit 0
+    fi
+
+    read -r url < <(./paste <<< "$output")
+    if [[ -n $url ]]
+    then
+        etc="etc... ( $url )"
+    else
+        etc="and so forth... (but now the pastebin is sick of me)"
+    fi
+
+    printf '%s\n' "$output" | head -n 2
+    printf '%s\n' "$etc"
 fi
-
-printf '%s\n' "$output" | head -n 2
-printf '%s\n' "$etc"
-
 
