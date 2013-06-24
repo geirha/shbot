@@ -76,19 +76,16 @@ printnum() {
     printf '%s\n' "${res[*]}"
 }
 
-if (( start == end && step != 0 )); then
-    printnum "$start"
-elif (( step > 0 )); then
-    for (( i = start; i <= end; i += step )); do
+if (( step > 0 && start <= end )); then
+    for (( i = start; i < end; i += step )); do
         printnum "$i"
     done
-elif (( step < 0 )); then
-    for (( i = start; i >= end; i += step )); do
+elif (( step < 0 && start >= end )); then
+    for (( i = start; i > end; i += step )); do
         printnum "$i"
     done
 else
     printf 'Nice try\n' >&2
     exit 1
 fi
-
-
+printnum "$i"
