@@ -1,0 +1,2 @@
+#!/bin/sh
+printf "Sorry, I don't do whichcraft.\n" >&2
