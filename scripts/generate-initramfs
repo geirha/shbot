@@ -266,7 +266,7 @@ declare -A commands='(
 # the empty directories in skel has an empty .gitignore file which we
 # remove afterwards.
 cp -RPp skel/ initramfs/ || exit
-find initramfs/ -name .gitignore -exec rm -f {} +
+find initramfs/ -name .gitignore -exec rm -f {} +
 
 declare -A command_paths='()' lib_paths='()'
 
