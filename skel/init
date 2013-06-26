@@ -20,6 +20,7 @@ PS1='$({ echo ${_x+o}>/proc/sysrq-trigger;set +x; } 2>/dev/null)${_x=}'
 PS2="Missing terminating quote, bracket or keyword"
 HOME=/root
 PATH=/bin
+TERM=dumb
 export PS1 PS2 HOME PATH
 cd "$HOME"
 
