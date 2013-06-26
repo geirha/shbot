@@ -189,7 +189,7 @@ runner=(     '> >'           \
              ' >>'           )
 
 # Variables for terminal requests.
-if [[ -t 2 && $TERM != dumb ]] && {
+[[ -t 2 && $TERM != dumb ]] && {
     alt=$(      tput smcup  || tput ti      ) # Start alt display
     ealt=$(     tput rmcup  || tput te      ) # End   alt display
     hide=$(     tput civis  || tput vi      ) # Hide cursor
