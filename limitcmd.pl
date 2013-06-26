@@ -20,7 +20,7 @@ foreach my $sig (@signals) {
     $SIG{$sig} = \&signal_handler;
 }
 
-alarm 4;
+alarm 6;
 while (($pid = wait) != -1 && $pid != $child) {}
 exit $?
 #exit ($pid == $child_pid ? 0 : 1);
