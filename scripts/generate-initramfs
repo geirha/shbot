@@ -262,21 +262,21 @@ declare -A commands='(
     [oawk]="pattern scanning and processing language"
 )'
 
+# Starting with the skeleton. git ignores empty directories, therefore 
+# the empty directories in skel has an empty .gitignore file which we
+# remove afterwards.
 cp -RPp skel/ initramfs/ || exit
+find initramfs/ -name .gitignore -exec rm -f {} +
 
 declare -A command_paths='()' lib_paths='()'
 
 enable -f build/loadables/realpath realpath || exit
 
-case $(uname -m) in
-    x86_64)
-        ln -s lib initramfs/lib64 &&
-        cp /lib64/ld-linux-x86-64.so.2 initramfs/lib64/
-    ;;
-    *)
-        cp /lib/ld-linux.so.2 initramfs/lib/
-    ;;
-esac || exit
+if [[ $(uname -m) = x86_64 ]]; then
+    cp /lib64/ld-linux-x86-64.so.2 initramfs/lib/
+else
+    cp /lib/ld-linux.so.2 initramfs/lib/
+fi || exit
 
 for cmd in "${!commands[@]}"; do
     if ! path=$(realpath "$(type -P "$cmd")") 2>/dev/null; then
@@ -306,6 +306,7 @@ done
 # file's magic database
 cp -RPp /usr/share/file initramfs/usr/share/
 
+# skel/etc/nsswitch.conf uses compat, so we'll need the corresponding so-file.
 cp "$(ldconfig -p|awk '$1=="libnss_compat.so.2"{print $NF;exit}')" "initramfs/lib/libnss_compat.so.2"
 
 # /root/*
