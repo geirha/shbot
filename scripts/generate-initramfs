@@ -309,20 +309,16 @@ cp -RPp /usr/share/file initramfs/usr/share/
 # skel/etc/nsswitch.conf uses compat, so we'll need the corresponding so-file.
 cp "$(ldconfig -p|awk '$1=="libnss_compat.so.2"{print $NF;exit}')" "initramfs/lib/libnss_compat.so.2"
 
-# /root/*
 {
+    printf "#!/bin/bash\n"
     printf "# Enables all loadables from the devel branch\n"
     for file in build/loadables/*; do
-        while read -r builtin_name; do 
-            printf 'enable -f %q %q\n' "${file##*/}" "$builtin_name"
-        done < <(
-            readelf --syms "$file" | awk '
-                $4 == "FUNC" &&
-                sub(/_builtin$/,"",$8) &&
-                !seen[$8]++ { print $8 }'
-        )
+        while IFS=' ' read -r name _; do 
+            [[ $name = *_struct ]] || continue
+            printf 'enable -f %q %q\n' "${file##*/}" "${name%_struct}"
+        done < <(nm -gP "$file")
     done
-} > initramfs/root/.load
+} > initramfs/usr/bin/loadables
    
 shopt -s nullglob
 # decide on a /bin/bash

@@ -6,3 +6,6 @@ printf %d "$RANDOM" > /dev/urandom
 unset date
 
 [ -n "$BASH" ] && . ~/.bashrc
+
+# Signal that the shell is ready
+printf '\n'

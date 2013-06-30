@@ -19,9 +19,9 @@ stty -echo
 PS1='$({ echo ${_x+o}>/proc/sysrq-trigger;set +x; } 2>/dev/null)${_x=}'
 PS2="Missing terminating quote, bracket or keyword"
 HOME=/root
-PATH=/bin
+PATH=/usr/bin:/bin
 TERM=dumb
-export PS1 PS2 HOME PATH
+export PS1 PS2 HOME PATH TERM
 cd "$HOME"
 
 # signal the savestate script that now is the time to save the state.

@@ -20,10 +20,10 @@ awks = build/bin/bwk build/bin/gawk3 build/bin/gawk4 build/bin/mawk \
 evalbot: hda
 	 
 
-initramfs.cpio.gz: $(shells) $(awks) build/bin/adu build/bin/ex initramfs
+initramfs.cpio.gz: initramfs
 	{ cd initramfs && pax -x sv4cpio -w .; } | gzip -9 > initramfs.cpio.gz
 
-initramfs: scripts/generate-initramfs
+initramfs: $(shells) $(awks) build/bin/adu build/bin/ex scripts/generate-initramfs
 	scripts/generate-initramfs
 
 build/bzImage:
@@ -47,8 +47,8 @@ clean:
 build/bash-%:
 	scripts/extract-from-git "$@"
 
-build/mksh:
-	cd build && env CVS_RSH=ssh cvs -qd _anoncvs@anoncvs.mirbsd.org:/cvs co -PA mksh
+sources/mksh:
+	env CVS_RSH=ssh cvs -qd _anoncvs@anoncvs.mirbsd.org:/cvs co -PAd "$@" mksh
 
 build/bin/bash1: build/bash-$(bash1_version)
 	scripts/build-shell bash $(bash1_version) bash1
@@ -62,7 +62,7 @@ build/bin/bash+: build/bash-devel
 	scripts/build-shell bash devel bash+
 build/bin/bsh:
 	scripts/build-shell bourne 050706 bsh
-build/bin/mksh: build/mksh
+build/bin/mksh: sources/mksh
 	scripts/build-shell mksh
 
 build/bin/bwk:
