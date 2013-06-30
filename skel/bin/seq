@@ -11,7 +11,7 @@ case $# in
 esac
 
 within_reason() {
-    local limit=19 s arg
+    local arg
     for arg; do
         arg=${arg#-}
         [[ $(bc <<< "2^63 - 1 - $arg") != -* ]] || return
