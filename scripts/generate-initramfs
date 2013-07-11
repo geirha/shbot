@@ -306,9 +306,10 @@ done
 # file's magic database
 cp -RPp /usr/share/file initramfs/usr/share/
 
-# skel/etc/nsswitch.conf uses compat, so we'll need the corresponding so-file.
+# etc/nsswitch.conf uses compat, so we'll need the corresponding so-file.
 cp "$(ldconfig -p|awk '$1=="libnss_compat.so.2"{print $NF;exit}')" "initramfs/lib/libnss_compat.so.2"
 
+# A file that enables all the example loadables. 
 {
     printf "#!/bin/bash\n"
     printf "# Enables all loadables from the devel branch\n"

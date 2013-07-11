@@ -1628,6 +1628,37 @@ shorten() {
 
 
 #  ______________________________________________________________________
+# |__ BuildArray ___________________________________________________________|
+#
+#       buildarray name terms... -- elements...
+#
+# Create an array by adding all the terms to it for each element, replacing {} terms by the element.
+#
+#   name        The name of the array to put the result into.
+#   terms       The values to add to the array for each of the elements.  A {} term is replaced by the current element.
+#   elements    The elements to iterate the terms for.
+#
+buildarray() {
+    local target=$1 term terms=() element value
+    shift
+
+    while [[ $1 != -- ]]; do
+        terms+=("$1")
+        shift
+    done
+    shift
+
+    for element; do
+        for term in "${terms[@]}"; do
+            [[ $term = {} ]] && value="$element" || value="$term"
+            declare -ag "$target+=($(printf '%q' "$value"))"
+        done
+    done
+} # _____________________________________________________________________
+
+
+
+#  ______________________________________________________________________
 # |__ InArray ___________________________________________________________|
 #
 #       inArray element array
