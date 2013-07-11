@@ -278,6 +278,12 @@ else
     cp /lib/ld-linux.so.2 initramfs/lib/
 fi || exit
 
+if type tic >/dev/null; then
+    tic -s -o initramfs/lib/terminfo dumb.terminfo
+else
+    printf >&2 'WARNING: not found: tic: %s\n' "Can't create terminfo entry"
+fi
+
 for cmd in "${!commands[@]}"; do
     if ! path=$(realpath "$(type -P "$cmd")") 2>/dev/null; then
         printf >&2 'WARNING: not found: %s - %s\n' "$cmd" "${commands[$cmd]}"

@@ -1,0 +1,4 @@
+dumb|80-column dumb tty,
+        am,
+        cols#80,
+        bel=^G, cr=^M, cud1=^J, ind=^J,
