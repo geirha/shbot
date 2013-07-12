@@ -70,7 +70,7 @@ build/bin/bwk:
 build/bin/gawk3:
 	scripts/build-awk gawk 3.1.8 gawk3
 build/bin/gawk4:
-	scripts/build-awk gawk 4.0.1 gawk4
+	scripts/build-awk gawk 4.1.0 gawk4
 build/bin/mawk:
 	scripts/build-awk mawk
 build/bin/nawk:
