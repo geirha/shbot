@@ -1,0 +1,4 @@
+dumb|80-column dumb tty:\
+    :am:\
+    :co#80:\
+    :bl=^G:cr=^M:do=^J:sf=^J:
