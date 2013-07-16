@@ -332,7 +332,7 @@ for cmd in "${!command_paths[@]}"; do
 done
 
 # file's magic database
-if [[ ${commands_paths[file]} ]]; then
+if [[ ${command_paths[file]} ]]; then
     mkdir -p initramfs/usr/share/misc &&
     cp /usr/share/misc/magic.mgc initramfs/usr/share/misc/ ||
         warn "couldn't copy file's magic databse. file won't work."
