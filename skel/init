@@ -11,8 +11,7 @@ mknod -m 644 /dev/urandom c 1 9
 ln -sf ttyS0 /dev/tty
 
 hostname bunnies
-mkdir -p /proc /tmp
-chmod 1777 /tmp
+chmod 1777 /tmp /var/tmp
 mount -t proc none /proc
 
 ldconfig
