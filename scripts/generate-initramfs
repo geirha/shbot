@@ -1,6 +1,7 @@
 #!/bin/bash
 
 PATH=$PWD/build/bin:$PATH
+
 usage() { cat << EOF
 Usage: ./generate-initramfs [-mh]
 
@@ -8,9 +9,32 @@ Usage: ./generate-initramfs [-mh]
     -m           Update manpages
 EOF
 }
+
 warn() { printf 'WARNING: %s\n' "$*"; } >&2
+
 die() { local r=$?; printf 'ERROR: %s\n' "$*"; exit "$r"; } >&2
+
 sprunge() { curl -F 'sprunge=<-' http://sprunge.us; }
+
+copy_libs() {
+    # copy_libs file...
+    #
+    # find all libs required by each (elf executable) FILE and copy
+    # those libs to initramfs/lib/
+
+    type ldd >/dev/null || die "ldd required"
+
+    local line n
+    local -A libs
+    while read -ra line; do
+        n=${#line[@]}
+        if (( n > 1 )) && [[ ${line[n-2]} = /* ]]; then
+            libs[${line[n-2]}]=
+        fi
+    done < <(ldd "$@")
+    cp "${!libs[@]}" initramfs/lib/
+}
+
 update_manpage() {
     local cmd=$1 md5 cur_md5
     ((update_manpages)) || return 0
@@ -272,12 +296,6 @@ find initramfs/ -name .gitignore -exec rm -f {} +
 
 declare -A command_paths='()' lib_paths='()'
 
-if [[ $(uname -m) = x86_64 ]]; then
-    cp /lib64/ld-linux-x86-64.so.2 initramfs/lib/
-else
-    cp /lib/ld-linux.so.2 initramfs/lib/
-fi || exit
-
 tic -s -o initramfs/lib/terminfo dumb.terminfo 2>/dev/null ||
     warn "can't create terminfo entry"
 
@@ -287,16 +305,9 @@ for cmd in "${!commands[@]}"; do
         continue
     fi
     command_paths[$cmd]=$path
-    while read -r lib _ location _; do
-        if [[ $location = /* ]]; then
-            lib_paths[${location##*/}]=$location
-        fi
-    done < <(ldd "$path" 2>/dev/null)
 done
 
-for lib in "${!lib_paths[@]}"; do
-    cp "${lib_paths[$lib]}" "initramfs/lib/$lib"
-done
+copy_libs "${command_paths[@]}"
 
 cp build/loadables/* initramfs/usr/lib
 
