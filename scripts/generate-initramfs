@@ -262,15 +262,13 @@ declare -A commands='(
     [oawk]="pattern scanning and processing language"
 )'
 
-# Starting with the skeleton. git ignores empty directories, therefore 
+# Starting with the skeleton. git ignores empty directories, therefore
 # the empty directories in skel has an empty .gitignore file which we
 # remove afterwards.
 cp -RPp skel/ initramfs/ || exit
 find initramfs/ -name .gitignore -exec rm -f {} +
 
 declare -A command_paths='()' lib_paths='()'
-
-enable -f build/loadables/realpath realpath || exit
 
 if [[ $(uname -m) = x86_64 ]]; then
     cp /lib64/ld-linux-x86-64.so.2 initramfs/lib/
@@ -285,7 +283,7 @@ else
 fi
 
 for cmd in "${!commands[@]}"; do
-    if ! path=$(realpath "$(type -P "$cmd")") 2>/dev/null; then
+    if ! path=$(type -P "$cmd"); then
         printf >&2 'WARNING: not found: %s - %s\n' "$cmd" "${commands[$cmd]}"
         continue
     fi
@@ -315,18 +313,18 @@ cp -RPp /usr/share/file initramfs/usr/share/
 # etc/nsswitch.conf uses compat, so we'll need the corresponding so-file.
 cp "$(ldconfig -p|awk '$1=="libnss_compat.so.2"{print $NF;exit}')" "initramfs/lib/libnss_compat.so.2"
 
-# A file that enables all the example loadables. 
+# A file that enables all the example loadables.
 {
     printf "#!/bin/bash\n"
     printf "# Enables all loadables from the devel branch\n"
     for file in build/loadables/*; do
-        while IFS=' ' read -r name _; do 
+        while IFS=' ' read -r name _; do
             [[ $name = *_struct ]] || continue
             printf 'enable -f %q %q\n' "${file##*/}" "${name%_struct}"
         done < <(nm -gP "$file")
     done
 } > initramfs/usr/bin/loadables
-   
+
 shopt -s nullglob
 # decide on a /bin/bash
 #bashes=( initramfs/bin/bash[1-4] )
