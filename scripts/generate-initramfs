@@ -262,6 +262,7 @@ declare -A commands='(
     [gzip]="compress or expand files"
     [hostname]="show or set the system'\''s host name"
     [ksh]="KornShell, a command and programming language"
+    [ldconfig]="configure dynamic linker run-time bindings"
     [mknod]="make block or character special files"
     [mksh]="MirBSD Korn shell"
     [mktemp]="create a temporary file or directory"
@@ -294,7 +295,7 @@ declare -A commands='(
 cp -RPp skel/ initramfs/ || exit
 find initramfs/ -name .gitignore -exec rm -f {} +
 
-declare -A command_paths='()' lib_paths='()'
+declare -A command_paths='()'
 
 tic -s -o initramfs/lib/terminfo dumb.terminfo 2>/dev/null ||
     warn "can't create terminfo entry"
@@ -305,6 +306,19 @@ for cmd in "${!commands[@]}"; do
         continue
     fi
     command_paths[$cmd]=$path
+    # special cases
+    case $cmd in
+        ldconfig)
+            # on debian/ubuntu, ldconfig is a wrapper script
+            if [[ $(dd bs=2 if="$path" count=1 2>/dev/null) = '#!' ]]; then
+                if [[ -x $path.real ]]; then
+                    command_paths[$cmd]=$path.real
+                else
+                    warn "couldn't find a usable ldconfig"
+                fi
+            fi
+        ;;
+    esac
 done
 
 copy_libs "${command_paths[@]}"
