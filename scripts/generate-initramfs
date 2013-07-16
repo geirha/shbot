@@ -141,7 +141,6 @@ declare -A commands='(
     [tsort]="topological sort"
     [tty]="return user'\''s terminal name"
     [uname]="return system name"
-    [uncompress]="[XSI] expand compressed data"
     [unexpand]="convert spaces to tabs"
     [uniq]="report or filter out repeated lines in a file"
     [unlink]="[XSI] call the unlink function"
@@ -226,6 +225,7 @@ declare -A commands='(
     ## Handled specially
     #[awk]="pattern scanning and processing language"
     #[sh]="shell, the standard command language interpreter"
+    #[uncompress]="[XSI] expand compressed data"
     #[zcat]="[XSI] expand and concatenate data"
 
     ## Other useful commands (non-POSIX)
