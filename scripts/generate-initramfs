@@ -297,7 +297,7 @@ find initramfs/ -name .gitignore -exec rm -f {} +
 
 declare -A command_paths='()'
 
-tic -s -o initramfs/lib/terminfo dumb.terminfo 2>/dev/null ||
+tic -s -o initramfs/etc/terminfo dumb.terminfo 2>/dev/null ||
     warn "can't create terminfo entry"
 
 for cmd in "${!commands[@]}"; do
