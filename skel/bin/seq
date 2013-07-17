@@ -77,15 +77,14 @@ printnum() {
 }
 
 if (( step > 0 && start <= end )); then
-    for (( i = start; i < end; i += step )); do
+    for (( i = start; i <= end; i += step )); do
         printnum "$i"
     done
 elif (( step < 0 && start >= end )); then
-    for (( i = start; i > end; i += step )); do
+    for (( i = start; i >= end; i += step )); do
         printnum "$i"
     done
 else
     printf 'Nice try\n' >&2
     exit 1
 fi
-printnum "$i"
