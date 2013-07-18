@@ -4,6 +4,9 @@ set +H
 # The remaining code won't work with bash 1.x
 case $BASH_VERSION in 1.*) return;; esac
 
+# Make the timing output one line instead of four
+TIMEFORMAT='real: %3lR, user: %3lU, sys: %3lS'
+
 # extglob was introduced in 2.02
 case ${BASH_VERSINFO[0]} in
     2)
