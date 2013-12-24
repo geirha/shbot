@@ -44,9 +44,7 @@ else
         exit 0
     fi
 
-    read -r url < <(./paste <<< "$output")
-    if [[ -n $url ]]
-    then
+    if url=$(curl -sfF 'f:1=<-' http://ix.io <<< "$output"); then
         etc="etc... ( $url )"
     else
         etc="and so forth... (but now the pastebin is sick of me)"
