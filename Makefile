@@ -27,7 +27,7 @@ initramfs: $(shells) $(awks) build/bin/adu build/bin/ex scripts/generate-initram
 	scripts/generate-initramfs
 
 build/bzImage:
-	scripts/build-linux http://www.kernel.org/pub/linux/kernel/v3.0/linux-3.9.5.tar.bz2
+	scripts/build-linux http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.12.6.tar.bz2
 
 hda: build/bzImage initramfs.cpio.gz 
 	qemu-img create -f qcow2 hda.tmp 1M
