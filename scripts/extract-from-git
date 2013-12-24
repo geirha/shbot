@@ -13,7 +13,7 @@ declare -A versions='(
 
 base=${1##*/}
 
-[[ ${versions[$base]} ]] || die "Unkown version: $base"
+[[ ${versions[$base]} ]] || die "Unknown version: $base"
 
 mkdir -p "$1" || exit 
 {
