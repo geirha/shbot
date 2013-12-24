@@ -1,6 +1,8 @@
 # disable history expansion
 set +H
 
+SECONDS=0
+
 # The remaining code won't work with bash 1.x
 case $BASH_VERSION in 1.*) return;; esac
 
