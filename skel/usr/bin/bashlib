@@ -48,6 +48,9 @@
 #     min numbers...
 # Outputs the lowest of the given numbers.
 #
+#     totime "YYYY-MM-DD HH:MM:SS.mmm"...
+# Outputs the number of milliseconds in the given date string(s).
+#
 #     exists application
 # Succeeds if the application is in PATH and is executable.
 #
@@ -90,11 +93,14 @@
 #     reverse [-0|-d delimitor] [elements ...] [<<< elements]
 # Reverse the order of the given elements.
 #
-#     order [-0] [-[cC] isAscending|-n] [elements ...] [<<< elements]
+#     order [-0|-d char] [-[cC] isAscending|-n] [-t number] [elements ...] [<<< elements]
 # Orders the elements in ascending order.
 #
 #     mutex file
 # Open a mutual exclusion lock on the file, unless another process already owns one.
+#
+#     pushjob [poolsize] command
+# Start an asynchronous command within a pool, waiting for space in the pool if it is full.
 #
 #     fsleep time
 # Wait for the given (fractional) amount of seconds.
@@ -114,6 +120,12 @@
 #     shorten [-p pwd] path [suffix]...
 # Shorten an absolute path for pretty printing.
 #
+#     up .../path|num
+# Walk the current working directory up towards root num times or until path is found.
+#
+#     buildarray name terms... -- elements...
+# Create an array by adding all the terms to it for each element, replacing {} terms by the element.
+#
 #     inArray element array
 # Checks whether a certain element is in the given array.
 #
@@ -126,8 +138,7 @@
 #     stackTrace
 # Output the current script's function execution stack.
 #
-_tocHash=cda4fc61e3a7a177597580ed6eab22a9
-
+_tocHash=71e13f42e1ea82c1c7019b27a3bc71f3
 
 
 #  ______________________________________________________________________ 
@@ -556,6 +567,20 @@ iterate() (
 # Log an event at a certain importance level.  The event is expressed as a printf(1) format argument.
 # The current exit code remains unaffected by the execution of this function.
 #
+# Instead of 'log', you can use a level as command name, to log at that level.  Using log, messages are
+# logged at level inf.  The supported levels are: trc, dbg, inf, wrn, err, ftl.
+#
+# If you prefix the command name with a p, the log message is shown as a spinner and waits for the next
+# closing statement.  Eg.
+#   
+#   pinf 'Converting image'
+#       convert image.png image.jpg
+#   fnip
+#
+# The closing statement (here fnip) is the reverse of the opening statement and exits with the exit code
+# of the last command.  If the last command failed, it shows the exit code in the spinner before it is stopped.
+# The closing statement also takes a format and arguments, which are displayed in the spinner.
+#
 log() {
     local exitcode=$? level=${level:-inf} supported=0 end=$'\n' type=msg conMsg= logMsg= format= colorFormat= date= info= arg= args=() colorArgs=() ruler=
 
@@ -577,7 +602,7 @@ log() {
     done
     shift "$((OPTIND-1))"
     format=$1 args=( "${@:2}" )
-    (( ${#args[@]} )) || { args=("$format") format=%s; local bold=; }
+    (( ! ${#args[@]} )) && [[ $format ]] && { args=("$format") format=%s; local bold=; }
 
     # Level-specific settings.
     case $level in
@@ -606,7 +631,7 @@ log() {
         msg|startProgress)
             printf -v logMsg "[%s %-3s] $format$end" "$date" "$level" "${args[@]}"
             if (( _logColor )); then
-                colorFormat=$(sed -e "s/$(requote "$reset")/$reset$logColor/g" -e "s/%[^a-z]*[a-z]/$reset$bold$logColor&$reset$logColor/g" <<< "$format")
+                colorFormat=$(sed ${reset:+-e "s/$(requote "$reset")/$reset$logColor/g"} -e "s/%[^a-z]*[a-z]/$reset$bold$logColor&$reset$logColor/g" <<< "$format")
                 colorArgs=("${args[@]//$reset/$reset$bold$logColor}")
                 printf -v conMsg "$reset[%s $logLevelColor%-3s$reset] $logColor$colorFormat$reset$black\$$reset$end$save" "$date" "$level" "${colorArgs[@]}"
             else
@@ -617,7 +642,7 @@ log() {
         updateProgress)
             printf -v logMsg printf " [$format]" "${args[@]}"
             if (( _logColor )); then
-                colorFormat=$(sed -e "s/$(requote "$reset")/$reset$logColor/g" -e "s/%[^a-z]*[a-z]/$reset$bold$logColor&$reset$logColor/g" <<< "$format")
+                colorFormat=$(sed ${reset:+-e "s/$(requote "$reset")/$reset$logColor/g"} -e "s/%[^a-z]*[a-z]/$reset$bold$logColor&$reset$logColor/g" <<< "$format")
                 colorArgs=("${args[@]//$reset/$reset$bold$logColor}")
                 printf -v conMsg "$load$eel$blue$bold[$reset$logColor$colorFormat$reset$blue$bold]$reset$end" "${colorArgs[@]}"
             else
@@ -629,7 +654,7 @@ log() {
             case $exitcode in
                 0)  printf -v logMsg "done${format:+ ($format)}.\n" "${args[@]}"
                     if (( _logColor )); then
-                        colorFormat=$(sed -e "s/$(requote "$reset")/$reset$logColor/g" -e "s/%[^a-z]*[a-z]/$reset$bold$logColor&$reset$logColor/g" <<< "$format")
+                        colorFormat=$(sed ${reset:+-e "s/$(requote "$reset")/$reset$logColor/g"} -e "s/%[^a-z]*[a-z]/$reset$bold$logColor&$reset$logColor/g" <<< "$format")
                         colorArgs=("${args[@]//$reset/$reset$bold$logColor}")
                         printf -v conMsg "$load$eel$green${bold}done${colorFormat:+ ($reset$logColor$colorFormat$reset$green$bold)}$reset.\n" "${colorArgs[@]}"
                     else
@@ -678,7 +703,8 @@ log() {
     if [[ $type = startProgress && ! $_logSpinner ]]; then
         {
             set +m
-            trap 'printf %s "$show"' EXIT
+            trap 'touch exit; printf %s "$show"' EXIT
+            echo "$BASHPID" > start
             printf %s "$hide"
             while printf "$eel$blue$bold[$reset%s$reset$blue$bold]$reset\b\b\b" "${spinner[s++ % ${#spinner[@]}]}" && sleep .1
             do :; done
@@ -726,6 +752,8 @@ _logTrcColor=$grey _logDbgColor=$blue _logInfColor=$white _logWrnColor=$yellow _
 #       emit [options] message... [-- [command args...]]
 #
 # Display a message with contextual coloring.
+#
+# DEPRECATED: Use inf and variants instead.
 #
 # When a command is provided, a spinner will be activated in front of the
 # message for as long as the command runs.  When the command ends, its
@@ -848,6 +876,8 @@ emit() {
 # |__ Spinner ___________________________________________________________|
 #
 #       spinner [-code|message... [-- style color textstyle textcolor]]
+#
+# DEPRECATED: Use pinf and variants instead.
 #
 # Displays a spinner on the screen that waits until a certain time.
 # Best used through its interface provided by 'emit'.
@@ -1002,6 +1032,8 @@ spinner() {
 #
 # This is a convenience function for replacement of spinner -code.
 #
+# DEPRECATED: Use fnip and variants instead.
+#
 # It checks either the exit code of the previously completed command or
 # the code provided as option to determine whether to display the success
 # or failure message.  It calls spinner -code to complete an actively
@@ -1096,6 +1128,7 @@ ask() {
     local silent=
     local valid=
     local muteChar=
+    local message=
 
     # Parse the options.
     local OPTIND=1
@@ -1122,18 +1155,20 @@ ask() {
     [[ -t 1 ]] && local fd=1 || local fd=2
 
     # Ask the question.
-    emit -yn "$*${option:+ [$option]}${options:+ [$options]} "
+    message=$1; shift; printf -v message "$message" "$@"
+    emit -yn "$message${option:+ [$option]}${options:+ [$options]} "
 
     # Read the reply.
+    exec 8<&0; [[ -t 8 ]] || exec 8</dev/tty
     if [[ $muteChar ]]; then
         local reply
-        while read -s -n1 && [[ $REPLY ]]; do
+        while read -u8 -s -n1 && [[ $REPLY ]]; do
             reply+=$REPLY
             printf '%s' "$muteChar"                                 >&$fd
         done
         REPLY=$reply
     else
-        read -e ${options:+-n1} ${silent:+-s}
+        read -u8 -e ${options:+-n1} ${silent:+-s}
     fi
     [[ $options && $REPLY ]] || (( silent )) && printf '\n'         >&$fd
 
@@ -1241,7 +1276,7 @@ reverse() {
 #  ______________________________________________________________________
 # |__ Order _____________________________________________________________|
 #
-#       order [-0] [-[cC] isAscending|-n] [elements ...] [<<< elements]
+#       order [-0|-d char] [-[cC] isAscending|-n] [-t number] [-a array|elements ...] [<<< elements]
 #
 # Orders the elements in ascending order.
 # Elements are read from command arguments or standard input if no element
@@ -1254,6 +1289,10 @@ reverse() {
 # as a comparator.
 # If the -C option is given, the bash code following it will be used
 # as a comparator.
+# If the -t option is given, only the first number results are returned.
+# If the -a option is given, the elements in array are ordered instead and
+# array is mutated to contain the result.
+# If number is 0, all results are returned.
 #
 # If given, isAscending comparator command will be executed for each element
 # comparison and will be passed two element arguments.  The command should
@@ -1270,23 +1309,27 @@ reverse() {
 order() {
    
     # Initialize the vars.
-    local elements=() element delimitor=$'\n' i isAscending=_order_string_ascends 
+    local elements=() element delimitor=$'\n' i isAscending=_order_string_ascends top=0 array= arrayElements=
 
     # Parse the options.
     local OPTIND=1
-    while getopts :0nd:c:C: opt; do
+    while getopts :0nd:c:C:t:a: opt; do
         case $opt in
             0) delimitor=$'\0' ;;
             d) delimitor=$OPTARG ;;
             n) comparator=_order_number_ascends ;;
             c) isAscending=$OPTARG ;;
             C) isAscending=_order_cmd_ascends _order_cmd=$OPTARG ;;
+            t) top=$OPTARG ;;
+            a) array=$OPTARG arrayElements=$array[@] ;;
         esac
     done
     shift "$((OPTIND-1))"
 
     # Get the elements.
-    if (( $# )); then
+    if [[ $array ]]; then
+        elements=( "${!arrayElements}" )
+    elif (( $# )); then
         elements=( "$@" )
     else
         while IFS= read -r -d "$delimitor"; do
@@ -1304,10 +1347,17 @@ order() {
             fi
         done
     done
-    printf "%s${delimitor:-'\0'}" "${elements[@]}"
+
+    (( top )) || top=${#elements[@]}
+    if [[ $array ]]; then
+        declare -ga "$array=($(printf '%q ' "${elements[@]:0:top}"))"
+    else
+        printf "%s${delimitor:-\0}" "${elements[@]:0:top}"
+    fi
 } # _____________________________________________________________________
 _order_string_ascends() { [[ $1 < $2 ]]; }
 _order_number_ascends() { (( $1 < $2 )); }
+_order_mtime_ascends() { [[ $1 -ot $2 ]]; }
 _order_cmd_ascends()    { bash -c "$_order_cmd" -- "$@"; }
 
 
@@ -1324,18 +1374,51 @@ _order_cmd_ascends()    { bash -c "$_order_cmd" -- "$@"; }
 # exec 9>&-
 #
 mutex() {
-    local file=${1:-${BASH_SOURCE[-1]}} pid pids
-    [[ -e $file ]] || err "No such file: $file" || return
+    local lockfile=${1:-${BASH_SOURCE[-1]}} pid pids
+    [[ -e $lockfile ]] || err "No such file: $lockfile" || return
 
-    exec 9>>"$file"
-    { pids=$(fuser -f "$file"); } 2>&- 9>&-
-    for pid in $pids; do
-        [[ $pid = $$ ]] && continue
-
-        exec 9>&-
-        return 1 # Locked by a pid.
-    done
+    exec 9>> "$lockfile" && [[ $({ fuser -f "$lockfile"; } 2>&- 9>&-) == $$ ]]
 }
+
+
+#  ______________________________________________________________________
+# |__ PushJob ___________________________________________________________|
+#
+#       pushjob [poolsize] command
+#
+# Start an asynchronous command within a pool, waiting for space in the pool if it is full.
+#
+# The pool is pruned automatically as running jobs complete.  This function
+# allows you to easily run asynchronous commands within a pool of N,
+# automatically starting the next command as soon as there's space.
+#
+pushjob() {
+    local size=$1; shift 1
+
+    # Wait for space in the pool.
+    until (( ${#jobpool[@]} < size )); do
+        sleep 1 & pushjobsleep=$!
+        wait "$pushjobsleep"
+    done 2>/dev/null
+
+    # Register prunejobs and start the pushed job.
+    trap _prunejobs SIGCHLD
+    set -m
+    "$@" & jobpool[$!]=
+}
+_prunejobs() {
+    # Prune all pool jobs that are no longer running.
+    for pid in "${!jobpool[@]}"; do
+        kill -0 "$pid" 2>/dev/null || unset "jobpool[$pid]"
+    done
+
+    # Unregister SIGCHLD if our pool is empty.
+    (( ${#jobpool[@]} )) || trap - SIGCHLD
+
+    # Wake up pushjob.
+    kill "$pushjobsleep" 2>/dev/null
+}
+
 
 
 
@@ -1628,7 +1711,33 @@ shorten() {
 
 
 #  ______________________________________________________________________
-# |__ BuildArray ___________________________________________________________|
+# |__ Up ________________________________________________________________|
+#
+#       up .../path|num
+#
+# Walk the current working directory up towards root num times or until path is found.
+#
+# Returns 0 if the destination was reached or 1 if we hit root.
+#
+# Prints PWD on stdout on success.
+#
+up() {
+    local up=0
+    until [[ $PWD = / ]]; do
+        cd ../
+
+        if [[ $1 = .../* ]]; then
+            [[ -e ${1#.../} ]] && pwd && return
+        elif (( ++up == $1 )); then
+            pwd && return
+        fi
+    done
+} # _____________________________________________________________________
+
+
+
+#  ______________________________________________________________________
+# |__ BuildArray ________________________________________________________|
 #
 #       buildarray name terms... -- elements...
 #
@@ -1690,39 +1799,6 @@ inArray() {
 
 
 #  ______________________________________________________________________
-# |__ xpathNodes ________________________________________________________|
-#
-#       xpathNodes query [files...]
-#
-# Outputs every xpath node that matches the query on a separate line.
-# Leading and trailing whitespace is always stripped.
-#
-#   file        The path to the file that contains the document to run the query on.
-#   query       The XPath query to run on the document.
-#
-xpathNodes() {
-    local query=$1; shift
-    [[ $1 ]] || set -- <(cat)
-
-    for file; do
-        {
-            if xpath -e / <(echo '<a></a>') >/dev/null 2>&1; then
-                xpath -e "$query" "$file" 2>&1
-            else
-                xpath "$file" "$query" 2>&1
-            fi
-        } | {
-            read
-            sed -ne $'s/-- NODE --/\\\n/g' -e 's/^[[:space:]]*\(.*[^[:space:]]\)[[:space:]]*$/\1/p'
-        }
-    done
-
-    return "${PIPESTATUS[0]}"
-}
-
-
-
-#  ______________________________________________________________________
 # |__ HideDebug _________________________________________________________|
 #
 #       hideDebug [on|off]
@@ -1746,6 +1822,75 @@ hideDebug() {
         set -x
     fi
 }
+
+
+
+#  ______________________________________________________________________
+# |__ anfunc ____________________________________________________________|
+#
+#       anfunc [on|off]
+#
+# Turn on or off support for annonymous functions.
+#
+# WARNING: This is a hack.  It turns on extdebug and causes any argument
+# that matches (){code} to be replaced by a function name that if invoked
+# runs code.
+#
+# eg.
+#   confirm '(){ rm "$1" }' *.txt
+#   # In this example, confirm() could be a function that asks confirmation
+#   # for each argument past the first and runs the anfunc in the first
+#   # argument on each confirmed argument.
+#
+# Don't use this.  It is an academic experiment and has bugs.
+#
+# Bugs:
+#   - commands lose their exit code.
+#       To inhibit the real command from running, we use extdebug and
+#       a DEBUG trap that returns non-0.  As a result, the actual return
+#       code is lost.
+# 
+anfunc() {
+    case "$1" in
+        on)
+            shopt -s extdebug
+            trap _anfunc_trap DEBUG
+        ;;
+        off)
+            trap - DEBUG
+            shopt -u extdebug
+        ;;
+    esac
+}
+_anfunc_trap() {
+    local f w
+
+    # Perform the command parsing and handling up to its word splitting.
+    # This includes command substitution, quote handling, pathname expansion, etc.
+    declare -a words="($BASH_COMMAND)"
+
+    # Iterate the words to run in the final stage, and handle anfunc matches.
+    for ((w=0; w<${#words[@]}; ++w)); do
+        [[ ${words[w]} = '(){'*'}' ]] &&
+            # Declare a new function for this anfunc.
+            eval "_f$((++f))${words[w]}" &&
+                # Replace the word by the new function's name.
+                words[w]="_f$f"
+    done
+    
+    # Run the command.
+    eval "$(printf '%q ' "${words[@]}")"
+    
+    # Clean up the anfuncs.
+    for ((; f>0; --f)); do
+        unset -f "_f$f"
+    done
+    
+    # Inhibit the real command's execution.
+    return 1
+}
+
+
 
 #  ______________________________________________________________________
 # |__ StackTrace ________________________________________________________|
@@ -1802,7 +1947,7 @@ stackTrace() {
 # |______________________________________________________________________|
 
 # Make sure this file is sourced and not executed.
-(( ! BASH_LINENO )) && {
+( return 2>/dev/null ) || {
     emit -R "You should source this file, not execute it."
     exit 1
 }
