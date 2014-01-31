@@ -1,0 +1,11 @@
+#!/bin/gawk4 -f
+
+function rev(s,   i,n,r) {
+    n = length(s);
+    for (i=n;i>=1;--i)
+        r = r substr(s,i,1);
+    return r;
+}
+
+BEGIN { RS="[ \t\n]+"; }
+{ printf("%s%s", rev($0), RT); }
