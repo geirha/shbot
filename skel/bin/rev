@@ -1,11 +1,25 @@
 #!/bin/gawk4 -f
 
-function rev(s,   i,n,r) {
+function rev(s,   c,i,n,r) {
     n = length(s);
-    for (i=n;i>=1;--i)
-        r = r substr(s,i,1);
+    for (i=n;i>=1;--i) {
+        c = substr(s, i, 1);
+        if (c in mapping)
+            c = mapping[c];
+        r = r c;
+    }
     return r;
 }
 
-BEGIN { RS="[ \t\n]+"; }
+BEGIN {
+    RS="[ \t\n]+";
+    mapping["("]=")";
+    mapping["["]="]";
+    mapping["{"]="}";
+    mapping["<"]=">";
+    mapping[")"]="(";
+    mapping["]"]="[";
+    mapping["}"]="{";
+    mapping[">"]="<";
+}
 { printf("%s%s", rev($0), RT); }
