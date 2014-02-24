@@ -17,9 +17,11 @@ BEGIN {
     mapping["["]="]";
     mapping["{"]="}";
     mapping["<"]=">";
+    mapping["/"]="\\";
     mapping[")"]="(";
     mapping["]"]="[";
     mapping["}"]="{";
     mapping[">"]="<";
+    mapping["\\"]="/";
 }
 { printf("%s%s", rev($0), RT); }
