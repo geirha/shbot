@@ -68,7 +68,7 @@ while (($#)); do
 done
 
 if ((update_manpages)) && [[ -f ix.io.conf ]]; then
-    if [[ -f helppages ]]; then
+    if [[ -f helppages ]]; then
         source ./helppages
     fi
     while IFS= read -r page; do
@@ -367,20 +367,25 @@ shopt -s nullglob
 # find latest bash 3.x
 for f in initramfs/bin/bash3?; do :; done
 ln -sf "${f##*/}" initramfs/bin/bash3
+manpages[bash3]=${manpages[${f##*/}]}
 
 # find latest bash 4.x
 for f in initramfs/bin/bash4?; do :; done
 ln -sf "${f##*/}" initramfs/bin/bash4
+manpages[bash4]=${manpages[${f##*/}]}
 
 ln -sf bash4 initramfs/bin/bash || exit
+manpages[bash]=${manpages[bash4]}
 
 # jsh, bourne shell with job control
 ln -sf bsh initramfs/bin/jsh
+manpages[jsh]=${manpages[bsh]}
 
 # decide on a /bin/sh
 for shell in initramfs/bin/{dash,{m,}ksh,bash}; do
     [[ -e $shell ]] || continue
     ln -sf "${shell##*/}" initramfs/bin/sh
+    manpages[sh]=${manpages[${shell##*/}]}
     break
 done
 
@@ -389,10 +394,17 @@ done
 # awk symlinks
 #awks=( initramfs/bin/gawk?* )
 ln -sf gawk4 initramfs/bin/gawk || exit
+manpages[gawk]=${manpages[gawk4]}
 
 for awk in nawk mawk gawk oawk bwk; do
     [[ -e initramfs/bin/$awk ]] || continue;
     ln -sf "$awk" initramfs/bin/awk
+    manpages[awk]=${manpages[$awk]}
     break
-done &&
+done
+ 
+if ((update_manpages)); then
+    declare -p manpages > manpages.tmp && mv manpages.tmp manpages
+fi
+
 touch initramfs
