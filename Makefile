@@ -8,11 +8,19 @@ shells += build/bin/bash1
 bash2_version = 2.05b
 shells += build/bin/bash2
 
-bash3_version = 3.2.48
-shells += build/bin/bash3
+bash31_version = 3.1.17
+shells += build/bin/bash31
+bash32_version = 3.2.48
+shells += build/bin/bash32
 
-bash4_version = 4.2.45
-shells += build/bin/bash4
+bash40_version = 4.0.38
+shells += build/bin/bash40
+#bash41_version = 4.1.11
+#shells += build/bin/bash41
+bash42_version = 4.2.45
+shells += build/bin/bash42
+bash43_version = 4.3.0
+shells += build/bin/bash43
 
 awks = build/bin/bwk build/bin/gawk3 build/bin/gawk4 build/bin/mawk \
        build/bin/nawk build/bin/oawk
@@ -27,7 +35,7 @@ initramfs: $(shells) $(awks) build/bin/adu build/bin/ex scripts/generate-initram
 	scripts/generate-initramfs
 
 build/bzImage:
-	scripts/build-linux http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.13.1.tar.xz
+	scripts/build-linux http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.13.5.tar.xz
 
 hda: build/bzImage initramfs.cpio.gz 
 	qemu-img create -f qcow2 hda.tmp 1M
@@ -54,10 +62,18 @@ build/bin/bash1: build/bash-$(bash1_version)
 	scripts/build-shell bash $(bash1_version) bash1
 build/bin/bash2: build/bash-$(bash2_version)
 	scripts/build-shell bash $(bash2_version) bash2
-build/bin/bash3: build/bash-$(bash3_version)
-	scripts/build-shell bash $(bash3_version) bash3
-build/bin/bash4: build/bash-$(bash4_version)
-	scripts/build-shell bash $(bash4_version) bash4
+build/bin/bash31: build/bash-$(bash31_version)
+	scripts/build-shell bash $(bash31_version) bash31
+build/bin/bash32: build/bash-$(bash32_version)
+	scripts/build-shell bash $(bash32_version) bash32
+build/bin/bash40: build/bash-$(bash40_version)
+	scripts/build-shell bash $(bash40_version) bash40
+build/bin/bash41: build/bash-$(bash41_version)
+	scripts/build-shell bash $(bash41_version) bash41
+build/bin/bash42: build/bash-$(bash42_version)
+	scripts/build-shell bash $(bash42_version) bash42
+build/bin/bash43: build/bash-$(bash43_version)
+	scripts/build-shell bash $(bash43_version) bash43
 build/bin/bash+: build/bash-devel
 	scripts/build-shell bash devel bash+
 build/bin/bsh:

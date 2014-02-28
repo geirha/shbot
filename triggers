@@ -2,7 +2,12 @@
 1	setsid bash1 -login
 2	setsid bash2 -l
 3	setsid bash3 -l
+31	setsid bash31 -l
+32	setsid bash32 -l
 4	setsid bash -l
+40	setsid bash40 -l
+42	setsid bash42 -l
+43	setsid bash43 -l
 b	PS1= TIMEOUT=1 exec -l bsh -i
 d	setsid dash -l
 j	PS1= TIMEOUT=1 exec -l jsh -i

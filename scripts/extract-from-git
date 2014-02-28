@@ -9,8 +9,9 @@ declare -A versions='(
     [bash-3.1.17]=95732b497d12c98613bb3c5db16b61f377501a59
     [bash-3.2.48]=f1be666c7d78939ad775078d290bec2758fa29a2
     [bash-4.0.38]=89a92869e56aba4e4cab2d639c00a86f0545c862
-    [bash-4.1.11]=30d188c2932d6ef609d894fefeb7e7b03ccff463
+    [bash-4.1.11]=bash-4.1.11  # a tag!
     [bash-4.2.45]=f281b8f4f8936b2713966274d9f8508a9f0910e4
+    [bash-4.3.0]=ac50fbac377e32b98d2de396f016ea81e8ee9961
     [bash-devel]=origin/devel
 )'
 

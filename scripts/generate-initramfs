@@ -277,8 +277,11 @@ declare -A commands='(
     ## Built with build-bash and build-awk
     [bash1]="GNU Bourne-Again SHell 1.x"
     [bash2]="GNU Bourne-Again SHell 2.x"
-    [bash3]="GNU Bourne-Again SHell 3.x"
-    [bash4]="GNU Bourne-Again SHell 4.x"
+    [bash31]="GNU Bourne-Again SHell 3.1.x"
+    [bash32]="GNU Bourne-Again SHell 3.2.x"
+    [bash40]="GNU Bourne-Again SHell 4.0.x"
+    [bash42]="GNU Bourne-Again SHell 4.2.x"
+    [bash43]="GNU Bourne-Again SHell 4.3.x"
     [bash+]="GNU Bourne-Again Shell devel branch"
     [bsh]="the standard command interpreter"
     [bwk]="pattern-directed scanning and processing language"
@@ -354,8 +357,14 @@ cp "$(ldconfig -p|awk '$1=="libnss_compat.so.2"{print $NF;exit}')" "initramfs/li
 } > initramfs/usr/bin/loadables
 
 shopt -s nullglob
-# decide on a /bin/bash
-#bashes=( initramfs/bin/bash[1-4] )
+# find latest bash 3.x
+for f in initramfs/bin/bash3?; do :; done
+ln -sf "${f##*/}" initramfs/bin/bash3
+
+# find latest bash 4.x
+for f in initramfs/bin/bash4?; do :; done
+ln -sf "${f##*/}" initramfs/bin/bash4
+
 ln -sf bash4 initramfs/bin/bash || exit
 
 # jsh, bourne shell with job control
