@@ -15,14 +15,14 @@ if [[ -f manpages && $2 = "man "[![:blank:]]* ]]; then
     read -r cmd args <<< "$2"
     source ./manpages &&
     if [[ ${manpages[$args]} ]]; then
-        printf '%s: %s\n' "$cmd" "${manpages[$args]}"
+        printf '%s: %s\n' "$2" "${manpages[$args]}"
         exit
     fi
 elif [[ -f helppages && $2 = "help "[![:blank:]]*  ]]; then
     read -r cmd args <<< "$2"
     source ./helppages &&
     if [[ ${helppages[$args]} ]]; then
-        printf '%s: %s\n' "$cmd" "${helppages[$args]}"
+        printf '%s: %s\n' "$2" "${helppages[$args]}"
         exit
     fi
 fi
