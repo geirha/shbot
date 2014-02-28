@@ -36,37 +36,26 @@ copy_libs() {
 }
 
 update_manpage() {
-    local cmd=$1 md5 cur_md5
-    ((update_manpages)) || return 0
-    {
-        MANWIDTH=80 man -l "build/man/man1/$cmd.1" ||
-        MANWIDTH=80 man "$cmd"
-    } > man.tmp 2>/dev/null || continue
-    md5=$(openssl md5 < man.tmp)
-    md5=${md5##* }
-
-    if [[ $md5 != "${md5s[$cmd]}" ]]; then
-        printf 'Updating manual for %s\n' "$cmd" >&2
-        md5s[$cmd]=$md5
-        urls[$cmd]=$(sprunge < man.tmp|tr -d ' ') &&
-        declare -p md5s urls > manpages.new &&
-        mv manpages{.new,}
-        sleep 2
-    else
-        curl -s "${urls[$cmd]}" | sed '$d' > man2.tmp || return
-        cur_md5=$(openssl md5 < man2.tmp)
-        cur_md5=${cur_md5##* }
-        if [[ $cur_md5 != "${md5s[$cmd]}" ]]; then
-            printf 'Updating manual for %s\n' "$cmd" >&2
-            md5s[$cmd]=$md5
-            urls[$cmd]=$(sprunge < man.tmp|tr -d ' ') &&
-            declare -p md5s urls > manpages.new &&
-            mv manpages{.new,}
-            sleep 2
-        fi
-    fi
+    local url status
+    ((update_manpages)) && [[ -e ix.io.conf ]] || return 0
+    read -r url < <(
+        if [[ $1 = adu && -e build/adu/adu.txt ]]; then
+            cat "build/adu/adu.txt"
+        else
+            MANWIDTH=80 man -l "build/man/man1/$1.1" ||
+            MANWIDTH=80 man "$1"
+        fi 2>/dev/null | 
+        curl -sSfK ix.io.conf -F'f:1=<-' -F"name:1=$1" -Fext:1=.1 http://ix.io
+    ) || {
+        status=$?
+        printf >&2 'failed to upload manpage for %s\n' "$1"
+        return "$status"
+    }
+    manpages[$1]=$url
+    declare -p manpages > manpages.tmp && mv manpages.tmp manpages
 }
 
+declare -A manpages=() helppages=()
 update_manpages=
 
 while (($#)); do
@@ -77,6 +66,24 @@ while (($#)); do
     esac
     shift
 done
+
+if ((update_manpages)) && [[ -f ix.io.conf ]]; then
+    if [[ -f helppages ]]; then
+        source ./helppages
+    fi
+    while IFS= read -r page; do
+        read -r url < <(
+            initramfs/bin/bash -c "help $(printf %q "$page")" |
+            curl -sSfK ix.io.conf -F'f:1=<-' -F"name:1=help $page" http://ix.io
+        ) || {
+            status=$?
+            printf >&2 'failed to upload helppage for %s\n' "$page"
+            return "$status"
+        }
+        helppages[$page]=$url
+        declare -p helppages > helppages.tmp && mv helppages.tmp helppages
+    done < <(compgen -A helptopic)
+fi
 
 declare -A commands='(
 

@@ -11,10 +11,18 @@ while read -r trigger shell; do
 done < ./triggers
 [[ ${triggers[$t]} ]] || exit
 
-if [[ $2 = "man "[![:blank:]]* ]]; then
-    source ./manpages
-    if [[ ${urls[${2#man }]} ]]; then
-        printf '%s: %s\n' "$2" "${urls[${2#man }]}"
+if [[ -f manpages && $2 = "man "[![:blank:]]* ]]; then
+    read -r cmd args <<< "$2"
+    source ./manpages &&
+    if [[ ${manpages[$args]} ]]; then
+        printf '%s: %s\n' "$cmd" "${manpages[$args]}"
+        exit
+    fi
+elif [[ -f helppages && $2 = "help "[![:blank:]]*  ]]; then
+    read -r cmd args <<< "$2"
+    source ./helppages &&
+    if [[ ${helppages[$args]} ]]; then
+        printf '%s: %s\n' "$cmd" "${helppages[$args]}"
         exit
     fi
 fi
