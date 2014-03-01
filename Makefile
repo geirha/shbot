@@ -15,8 +15,8 @@ shells += build/bin/bash32
 
 bash40_version = 4.0.38
 shells += build/bin/bash40
-#bash41_version = 4.1.11
-#shells += build/bin/bash41
+bash41_version = 4.1.11
+shells += build/bin/bash41
 bash42_version = 4.2.45
 shells += build/bin/bash42
 bash43_version = 4.3.0

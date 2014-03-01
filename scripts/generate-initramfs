@@ -293,6 +293,7 @@ declare -A commands='(
     [bash31]="GNU Bourne-Again SHell 3.1.x"
     [bash32]="GNU Bourne-Again SHell 3.2.x"
     [bash40]="GNU Bourne-Again SHell 4.0.x"
+    [bash41]="GNU Bourne-Again SHell 4.1.x"
     [bash42]="GNU Bourne-Again SHell 4.2.x"
     [bash43]="GNU Bourne-Again SHell 4.3.x"
     [bash+]="GNU Bourne-Again Shell devel branch"

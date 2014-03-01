@@ -6,6 +6,7 @@
 32	setsid bash32 -l
 4	setsid bash -l
 40	setsid bash40 -l
+41	setsid bash41 -l
 42	setsid bash42 -l
 43	setsid bash43 -l
 b	PS1= TIMEOUT=1 exec -l bsh -i
