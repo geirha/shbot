@@ -8,6 +8,8 @@ shells += build/bin/bash1
 bash2_version = 2.05b
 shells += build/bin/bash2
 
+bash30_version = 3.0.16
+shells += build/bin/bash30
 bash31_version = 3.1.17
 shells += build/bin/bash31
 bash32_version = 3.2.48
@@ -62,6 +64,8 @@ build/bin/bash1: build/bash-$(bash1_version)
 	scripts/build-shell bash $(bash1_version) bash1
 build/bin/bash2: build/bash-$(bash2_version)
 	scripts/build-shell bash $(bash2_version) bash2
+build/bin/bash30: build/bash-$(bash30_version)
+	scripts/build-shell bash $(bash30_version) bash30
 build/bin/bash31: build/bash-$(bash31_version)
 	scripts/build-shell bash $(bash31_version) bash31
 build/bin/bash32: build/bash-$(bash32_version)
