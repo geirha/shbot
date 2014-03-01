@@ -346,7 +346,7 @@ cp build/loadables/* initramfs/usr/lib
 
 for cmd in "${!command_paths[@]}"; do
     cp "${command_paths[$cmd]}" "initramfs/bin/$cmd" &&
-    strip "$initramfs/bin/$cmd" 2>/dev/null
+    strip "initramfs/bin/$cmd"
     if (( update_all )) || [[ -z ${manpages[$cmd]} ]]; then
         update_manpage "$cmd"
     fi
