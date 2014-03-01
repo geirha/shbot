@@ -1,4 +1,4 @@
-#!/bin/bash
+#!build/bin/bash43
 
 PATH=$PWD/build/bin:$PATH
 
@@ -7,6 +7,7 @@ Usage: ./generate-initramfs [-mh]
 
     -h, --help   Display this help
     -m           Update manpages
+    -f           If used with -m, also update existing manpages
 EOF
 }
 
@@ -38,6 +39,7 @@ copy_libs() {
 update_manpage() {
     local url status
     ((update_manpages)) && [[ -e ix.io.conf ]] || return 0
+    printf >&2 'Updating manpage for %s\n' "$1"
     read -r url < <(
         if [[ $1 = adu && -e build/adu/adu.txt ]]; then
             cat "build/adu/adu.txt"
@@ -57,11 +59,13 @@ update_manpage() {
 
 declare -A manpages=() helppages=()
 update_manpages=
+update_all=0
 
 while (($#)); do
     case $1 in
         -h|--help) usage; exit ;;
         -m) update_manpages=1; source ./manpages;;
+        -f) update_all=1;; 
          *) usage; exit 1 ;;
     esac
     shift
@@ -72,15 +76,17 @@ if ((update_manpages)) && [[ -f ix.io.conf ]]; then
         source ./helppages
     fi
     while IFS= read -r page; do
+        ((update_all)) || [[ -z ${helppages[$page]} ]] || continue
+        printf >&2 'Updating helppage for %s\n' "$page"
+        mapfile -t lines < <(help "$page")
         read -r url < <(
-            initramfs/bin/bash -c "help $(printf %q "$page")" |
+            printf '%s\n' "${lines[@]}" |
             curl -sSfK ix.io.conf -F'f:1=<-' -F"name:1=help $page" http://ix.io
         ) || {
             status=$?
             printf >&2 'failed to upload helppage for %s\n' "$page"
-            return "$status"
         }
-        helppages[$page]=$url
+        helppages[$page]="${lines[0]} -- $url"
         declare -p helppages > helppages.tmp && mv helppages.tmp helppages
     done < <(compgen -A helptopic)
 fi
@@ -302,6 +308,7 @@ declare -A commands='(
 # Starting with the skeleton. git ignores empty directories, therefore
 # the empty directories in skel has an empty .gitignore file which we
 # remove afterwards.
+rm -rf initramfs/
 cp -RPp skel/ initramfs/ || exit
 find initramfs/ -name .gitignore -exec rm -f {} +
 
@@ -338,7 +345,9 @@ cp build/loadables/* initramfs/usr/lib
 for cmd in "${!command_paths[@]}"; do
     cp "${command_paths[$cmd]}" "initramfs/bin/$cmd" &&
     strip "$initramfs/bin/$cmd" 2>/dev/null
-    update_manpage "$cmd"
+    if (( update_all )) || [[ -z ${manpages[$cmd]} ]]; then
+        update_manpage "$cmd"
+    fi
 done
 
 # file's magic database
