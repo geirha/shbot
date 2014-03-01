@@ -22,7 +22,7 @@ elif [[ -f helppages && $2 = "help "[![:blank:]]*  ]]; then
     read -r cmd args <<< "$2"
     source ./helppages &&
     if [[ ${helppages[$args]} ]]; then
-        printf '%s: %s\n' "$2" "${helppages[$args]}"
+        printf '%s\n' "${helppages[$args]}"
         exit
     fi
 fi
