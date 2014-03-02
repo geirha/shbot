@@ -6,4 +6,4 @@ mkdir -p build/{bin,adu} &&
 cd build/adu &&
 gzip -cd "$srcdir/sources/adu.tar.Z" | pax -r &&
 make -f adu.mak &&
-cp adu ../bin &&
+cp adu ../bin
