@@ -1,0 +1,75 @@
+==> debug-trap.patch <==
+*** ../bash-4.3/trap.c	2014-02-05 10:03:21.000000000 -0500
+--- x/trap.c	2014-02-28 09:51:43.000000000 -0500
+***************
+*** 921,925 ****
+  
+  #if defined (JOB_CONTROL)
+!       save_pipeline (1);	/* XXX only provides one save level */
+  #endif
+  
+--- 921,926 ----
+  
+  #if defined (JOB_CONTROL)
+!       if (sig != DEBUG_TRAP)	/* run_debug_trap does this */
+! 	save_pipeline (1);	/* XXX only provides one save level */
+  #endif
+  
+***************
+*** 941,945 ****
+  
+  #if defined (JOB_CONTROL)
+!       restore_pipeline (1);
+  #endif
+  
+--- 942,947 ----
+  
+  #if defined (JOB_CONTROL)
+!       if (sig != DEBUG_TRAP)	/* run_debug_trap does this */
+! 	restore_pipeline (1);
+  #endif
+  
+
+==> jobs-exit.patch <==
+*** ../bash-4.3/jobs.c	2014-01-10 09:05:34.000000000 -0500
+--- x/jobs.c	2014-03-02 18:05:09.000000000 -0500
+***************
+*** 4375,4379 ****
+  end_job_control ()
+  {
+!   if (interactive_shell)		/* XXX - should it be interactive? */
+      {
+        terminate_stopped_jobs ();
+--- 4375,4379 ----
+  end_job_control ()
+  {
+!   if (interactive_shell || job_control)		/* XXX - should it be just job_control? */
+      {
+        terminate_stopped_jobs ();
+
+==> test-nameref.patch <==
+*** ../bash-4.3/test.c	2014-02-04 16:52:58.000000000 -0500
+--- x/test.c	2014-02-28 21:22:44.000000000 -0500
+***************
+*** 647,652 ****
+  
+      case 'R':
+!       v = find_variable (arg);
+!       return (v && invisible_p (v) == 0 && var_isset (v) && nameref_p (v) ? TRUE : FALSE);
+      }
+  
+--- 647,652 ----
+  
+      case 'R':
+!       v = find_variable_noref (arg);
+!       return ((v && invisible_p (v) == 0 && var_isset (v) && nameref_p (v)) ? TRUE : FALSE);
+      }
+  
+***************
+*** 724,727 ****
+--- 724,728 ----
+      case 'u': case 'v': case 'w': case 'x': case 'z':
+      case 'G': case 'L': case 'O': case 'S': case 'N':
++     case 'R':
+        return (1);
+      }
