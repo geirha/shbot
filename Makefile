@@ -21,7 +21,7 @@ bash41_version = 4.1.11
 shells += build/bin/bash41
 bash42_version = 4.2.45
 shells += build/bin/bash42
-bash43_version = 4.3.8
+bash43_version = 4.3.11
 shells += build/bin/bash43
 
 awks = build/bin/bwk build/bin/gawk3 build/bin/gawk4 build/bin/mawk \

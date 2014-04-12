@@ -14,6 +14,7 @@ declare -A versions='(
     [bash-4.2.45]=f281b8f4f8936b2713966274d9f8508a9f0910e4
     [bash-4.3.0]=ac50fbac377e32b98d2de396f016ea81e8ee9961
     [bash-4.3.8]=7137b2df58b6506ccae6efa9a13be467e87efc4f
+    [bash-4.3.11]=b7ec1810367e42788ded6c2fb99db698bd26ccf1
     [bash-devel]=origin/devel
 )'
 
