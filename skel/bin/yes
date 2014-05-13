@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+unset s
+(( $# )) && s="$*"
+while :; do
+    printf '%s\n' "${s-n}"
+done
