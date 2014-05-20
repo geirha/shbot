@@ -1,9 +1,39 @@
 #!/bin/bash
 
+processHooks() {
+	if [[ -f manpages && $2 = "man "[![:blank:]]* ]]; then
+		local cmd args manpages
+		read -r cmd args <<< "$2"
+		source ./manpages &&
+		if [[ ${manpages[$args]} ]]; then
+			printf '%s: %s\n' "$2" "${manpages[$args]}"
+			exit
+		fi
+	elif [[ -f helppages && $2 = "help "[![:blank:]]*  ]]; then
+		local cmd args helppages
+		read -r cmd args <<< "$2"
+		source ./helppages &&
+		if [[ ${helppages[$args]} ]]; then
+			printf '%s\n' "${helppages[$args]}"
+			exit
+		fi
+	elif [[ $2 = trigger?(s) ]]; then
+		printf 'Available triggers: '
+
+		local idx
+		for idx in "${!triggers[@]}"; do
+			printf '%s: %s; ' "$idx" "${triggers[$idx]}" 
+		done
+
+		exit
+	fi
+}
+
 if [[ $1 = -n ]]; then
     nopaste=1
     shift
 fi
+
 t=${1:-4}
 declare -A triggers='()'
 while read -r trigger shell; do
@@ -11,21 +41,7 @@ while read -r trigger shell; do
 done < ./triggers
 [[ ${triggers[$t]} ]] || exit
 
-if [[ -f manpages && $2 = "man "[![:blank:]]* ]]; then
-    read -r cmd args <<< "$2"
-    source ./manpages &&
-    if [[ ${manpages[$args]} ]]; then
-        printf '%s: %s\n' "$2" "${manpages[$args]}"
-        exit
-    fi
-elif [[ -f helppages && $2 = "help "[![:blank:]]*  ]]; then
-    read -r cmd args <<< "$2"
-    source ./helppages &&
-    if [[ ${helppages[$args]} ]]; then
-        printf '%s\n' "${helppages[$args]}"
-        exit
-    fi
-fi
+processHooks "$@"
 
 output=$(./limitcmd.pl "${triggers[$t]}" "$2" | expand | head -c 4242 | tr -d '\r' | awk '{ do { print substr($0, 1, 120); $0 = substr($0, 121); } while(length($0)>0);  }'; exit ${PIPESTATUS[0]}; )
 result=$?
