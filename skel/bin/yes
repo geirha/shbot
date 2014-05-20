@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+if [[ $1 = @(-h|--help) ]]; then
+    printf 'no\n'
+    exit
+fi
 unset s
 (( $# )) && s="$*"
 while :; do
