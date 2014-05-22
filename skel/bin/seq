@@ -64,12 +64,12 @@ printnum() {
         fi
 
         if (( part > 0 && part % 10 == 0 )); then
-            res+=( "${tens[part/10]}" "${units[e]}" )
+            res+=( "${tens[part/10]}" ${units[e]+"${units[e]}"} )
         elif (( part > 20 )); then
             res+=( "${tens[part/10]}-${simple_nums[part%10]}"
-                   "${units[e]}" )
+                   ${units[e]+"${units[e]}"} )
         elif (( part > 0 )); then
-            res+=( "${simple_nums[part]}" "${units[e]}" )
+            res+=( "${simple_nums[part]}" ${units[e]+"${units[e]}"} )
         fi
     done
 
