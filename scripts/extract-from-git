@@ -5,31 +5,34 @@ die() { local ret=$?; printf '%s\n' "$@" >&2; exit "$ret"; }
 
 declare -A versions='(
     [bash-1.14.7]=726f63884db0132f01745f1fb4465e6621088ccf
-    [bash-2.05a]=f73dda092b33638d2d5e9c35375f687a607b5403
-    [bash-2.05b]=7117c2d221b2aed4ede8600f6a36b7c1454b4f55
+    [bash-2.05a.0]=f73dda092b33638d2d5e9c35375f687a607b5403
+    [bash-2.05b.0]=7117c2d221b2aed4ede8600f6a36b7c1454b4f55
     [bash-3.0.16]=eb87367179effbe5f430236db8259006d71438b7
-    [bash-3.1.17]=95732b497d12c98613bb3c5db16b61f377501a59
+    [bash-3.1.0]=95732b497d12c98613bb3c5db16b61f377501a59
     [bash-3.2.48]=f1be666c7d78939ad775078d290bec2758fa29a2
     [bash-4.0.38]=89a92869e56aba4e4cab2d639c00a86f0545c862
-    [bash-4.1.11]=bash-4.1.11  # a tag!
+    [bash-4.1.11]=bash-4.1.11
     [bash-4.2.45]=f281b8f4f8936b2713966274d9f8508a9f0910e4
-    [bash-4.3.0]=ac50fbac377e32b98d2de396f016ea81e8ee9961
-    [bash-4.3.8]=7137b2df58b6506ccae6efa9a13be467e87efc4f
-    [bash-4.3.11]=b7ec1810367e42788ded6c2fb99db698bd26ccf1
-    [bash-4.3.18]=35751626eebdec08c6ac8600b33477e6db31988a
+    [bash-4.3.29]=origin/master
     [bash-devel]=origin/devel
 )'
 
-base=${1##*/}
-
-[[ ${versions[$base]} ]] || die "Unknown version: $base"
+ver=${1##*/}
+basever=$ver
+if [[ ! ${versions[$ver]} ]]; then 
+    IFS=. read -r major minor patch <<< "${ver#bash-}"
+    while [[ ! ${versions[$basever]} && $patch != 0 ]]; do
+        basever=bash-$major.$minor.$((--patch))
+    done
+fi
+commit=${versions[$basever]?Unknown version: $ver}
 
 mkdir -p "$1" || exit 
 {
     cd bash && 
-    git archive --prefix="$1/" --format=tar "${versions[$base]}"
+    git archive --prefix="$1/" --format=tar "$commit"
 } | pax -r
 
-if [[ -f patches/$base ]]; then
-    { cd "$1" && patch -p1; } < "patches/$base"
+if [[ -x patches/$basever ]]; then
+    cd "$1" && "../../patches/$basever"
 fi

@@ -1,0 +1,930 @@
+#!/bin/sh
+# The official patches forget to modify PATCHLEVEL
+patch -p1 << 'EOF'
+diff --git a/patchlevel.h b/patchlevel.h
+index 4c2c67a..5eaed70 100644
+--- a/patchlevel.h
++++ b/patchlevel.h
+@@ -25,6 +25,6 @@
+    regexp `^#define[   ]*PATCHLEVEL', since that's what support/mkversion.sh
+    looks for to find the patch level (for the sccs version string). */
+ 
+-#define PATCHLEVEL 0
++#define PATCHLEVEL 12
+ 
+ #endif /* _PATCHLEVEL_H_ */
+EOF
+
+patch -p1 <<'EOF'
+From 5089f668465e0d6f1fdc075ddc95bb758ae98230 Mon Sep 17 00:00:00 2001
+From: Geir Hauge <geir.hauge@gmail.com>
+Date: Sat, 25 May 2013 14:54:19 +0200
+Subject: [PATCH] Fix a build error
+
+---
+ lib/malloc/malloc.c |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/malloc/malloc.c b/lib/malloc/malloc.c
+index 0b4c847..190cccd 100644
+--- a/lib/malloc/malloc.c
++++ b/lib/malloc/malloc.c
+@@ -879,6 +879,7 @@ internal_free (mem, file, line, flags)
+   busy[nunits] = 0;
+ 
+ free_return:
++  ;            /* Empty statement in case this is the end of the function */
+ 
+ #ifdef MALLOC_STATS
+   _mstats.nmalloc[nunits]--;
+-- 
+1.7.10.4
+
+EOF
+
+patch -p0 <<'EOF'
+			     BASH PATCH REPORT
+			     =================
+
+Bash-Release: 2.05b
+Patch-ID: bash205b-001
+
+Bug-Reported-by:    taviso@sdf.lonestar.org
+Bug-Reference-ID:   <200208021107.g72B723d021352@darkstar.example.net>
+Bug-Reference-URL:  http://mail.gnu.org/pipermail/bug-bash/2002-August/004980.html
+
+Bug-Description:
+
+Bash goes into an infinite loop and eventually crashes with a SIGSEGV
+when some keys on the numeric keypad are pressed, possibly in combination
+with the shift key.
+
+Patch:
+
+*** ../bash-2.05b/lib/readline/bind.c	Thu Jan 24 11:15:52 2002
+--- lib/readline/bind.c	Wed Jul 31 09:11:18 2002
+***************
+*** 312,316 ****
+  	     and the function bound  to `a' to be executed when the user
+  	     types `abx', leaving `bx' in the input queue. */
+! 	  if (k.function /* && k.type == ISFUNC */)
+  	    {
+  	      map[ANYOTHERKEY] = k;
+--- 312,316 ----
+  	     and the function bound  to `a' to be executed when the user
+  	     types `abx', leaving `bx' in the input queue. */
+! 	  if (k.function && ((k.type == ISFUNC && k.function != rl_do_lowercase_version) || k.type == ISMACR))
+  	    {
+  	      map[ANYOTHERKEY] = k;
+			     BASH PATCH REPORT
+			     =================
+
+Bash-Release: 2.05b
+Patch-ID: bash205b-002
+
+Bug-Reported-by:  rwhron@earthlink.net
+Bug-Reference-ID: <20020724000454.GA15210@rushmore> (bug-bash)
+Bug-Reference-URL: http://mail.gnu.org/pipermail/bug-bash/2002-July/004856.html
+
+Bug-Description:
+
+Repeating an edit in vi-mode with `.' does not work.
+
+Patch:
+
+*** ../bash-2.05b/lib/readline/readline.c	Wed Mar 13 17:10:46 2002
+--- lib/readline/readline.c	Tue Jul 30 17:46:44 2002
+***************
+*** 685,688 ****
+--- 685,689 ----
+  #if defined (VI_MODE)
+    if (rl_editing_mode == vi_mode && _rl_keymap == vi_movement_keymap &&
++       key != ANYOTHERKEY &&
+        _rl_vi_textmod_command (key))
+      _rl_vi_set_last (key, rl_numeric_arg, rl_arg_sign);
+
+			     BASH PATCH REPORT
+			     =================
+
+Bash-Release: 2.05b
+Patch-ID: bash205b-003
+
+Bug-Reported-by:   jan.q.bruun-andersen@posten.se
+Bug-Reference-ID:  <BE156C6450189B4ABAF7381F0AD4724A0165674F@002exmbs002.ad.posten.se>
+Bug-Reference-URL: http://mail.gnu.org/pipermail/bug-bash/2002-July/004789.html
+
+Bug-Description:
+
+In certain cases, Bash appends a space instead of a slash to a directory
+name relative to the current directory when performing command name
+completion.  This affects partial completion of intermediate directory
+names.
+
+Patch:
+
+*** ../bash-2.05b/bashline.c	Tue May  7 15:52:42 2002
+--- bashline.c	Sat Aug  3 11:40:16 2002
+***************
+*** 1045,1049 ****
+--- 1045,1052 ----
+        else
+  	{
++ #define CMD_IS_DIR(x)	(absolute_pathname(x) == 0 && *(x) != '~' && test_for_directory (x))
++ 
+  	  matches = rl_completion_matches (text, command_word_completion_function);
++ 
+  	  /* If we are attempting command completion and nothing matches, we
+  	     do not want readline to perform filename completion for us.  We
+***************
+*** 1053,1057 ****
+  	  if (matches == (char **)NULL)
+  	    rl_ignore_some_completions_function = bash_ignore_filenames;
+! 	  else if (matches[1] == 0 && *matches[0] != '/')
+  	    /* Turn off rl_filename_completion_desired so readline doesn't
+  	       append a slash if there is a directory with the same name
+--- 1056,1060 ----
+  	  if (matches == (char **)NULL)
+  	    rl_ignore_some_completions_function = bash_ignore_filenames;
+! 	  else if (matches[1] == 0 && CMD_IS_DIR(matches[0]))
+  	    /* Turn off rl_filename_completion_desired so readline doesn't
+  	       append a slash if there is a directory with the same name
+***************
+*** 1062,1066 ****
+  	       conflict. */
+  	    rl_filename_completion_desired = 0;
+! 	  else if (matches[0] && matches[1] && STREQ (matches[0], matches[1]) && *matches[0] != '/')
+  	    /* There are multiple instances of the same match (duplicate
+  	       completions haven't yet been removed).  In this case, all of
+--- 1065,1069 ----
+  	       conflict. */
+  	    rl_filename_completion_desired = 0;
+! 	  else if (matches[0] && matches[1] && STREQ (matches[0], matches[1]) && CMD_IS_DIR (matches[0]))
+  	    /* There are multiple instances of the same match (duplicate
+  	       completions haven't yet been removed).  In this case, all of
+			     BASH PATCH REPORT
+			     =================
+
+Bash-Release: 2.05b
+Patch-ID: bash205b-004
+
+Bug-Reported-by:   c.f.a.johnson@rogers.com
+Bug-Reference-ID:  <aji8sb$1aa9bi$2@ID-136730.news.dfncis.de>
+Bug-Reference-URL: http://mail.gnu.org/pipermail/bug-bash/2002-August/005074.html
+
+Bug-Description:
+
+A bug in the bash variable expansion code causes leading blanks in a
+variable's value to be ignored when computing its length.
+
+Patch:
+
+*** ../bash-2.05b/subst.c	Mon Jun 24 07:59:45 2002
+--- subst.c	Sat Aug 17 17:28:46 2002
+***************
+*** 1639,1647 ****
+  /* This performs word splitting and quoted null character removal on
+     STRING. */
+! #if 0
+! #define issep(c)	((separators)[1] ? (member ((c), separators)) : (c) == (separators)[0])
+! #else
+! #define issep(c)	((separators)[1] ? isifs(c) : (c) == (separators)[0])
+! #endif
+  
+  WORD_LIST *
+--- 1639,1646 ----
+  /* This performs word splitting and quoted null character removal on
+     STRING. */
+! #define issep(c) \
+! 	(((separators)[0]) ? ((separators)[1] ? isifs(c) \
+! 					      : (c) == (separators)[0]) \
+! 			   : 0)
+  
+  WORD_LIST *
+
+
+			     BASH PATCH REPORT
+			     =================
+
+Bash-Release: 2.05b
+Patch-ID: bash205b-005
+
+Bug-Reported-by:	Jim Meyering <jim@meyering.net>
+Bug-Reference-ID:	<87bs6v8iib.fsf@pixie.eng.ascend.com>
+Bug-Reference-URL:	http://mail.gnu.org/archive/html/bug-bash/2002-09/msg00047.html
+
+Bug-Description:
+
+When in a locale with multibyte characters, the readline display updater
+will occasionally cause a segmentation fault when attempting to compute
+the length of the first multibyte character on the line.
+
+Patch:
+
+*** ../bash-2.05b/lib/readline/mbutil.c	Tue Jun  4 11:54:29 2002
+--- lib/readline/mbutil.c	Mon Aug  5 11:20:39 2002
+***************
+*** 206,210 ****
+      {
+        /* shorted to compose multibyte char */
+!       memset (ps, 0, sizeof(mbstate_t));
+        return -2;
+      }
+--- 206,211 ----
+      {
+        /* shorted to compose multibyte char */
+!       if (ps)
+! 	memset (ps, 0, sizeof(mbstate_t));
+        return -2;
+      }
+***************
+*** 213,217 ****
+        /* invalid to compose multibyte char */
+        /* initialize the conversion state */
+!       memset (ps, 0, sizeof(mbstate_t));
+        return -1;
+      }
+--- 214,219 ----
+        /* invalid to compose multibyte char */
+        /* initialize the conversion state */
+!       if (ps)
+! 	memset (ps, 0, sizeof(mbstate_t));
+        return -1;
+      }
+***************
+*** 226,232 ****
+  int
+  _rl_compare_chars (buf1, pos1, ps1, buf2, pos2, ps2)
+!      char *buf1, *buf2;
+!      mbstate_t *ps1, *ps2;
+!      int pos1, pos2;
+  {
+    int i, w1, w2;
+--- 228,237 ----
+  int
+  _rl_compare_chars (buf1, pos1, ps1, buf2, pos2, ps2)
+!      char *buf1;
+!      int pos1;
+!      mbstate_t *ps1;
+!      char *buf2;
+!      int pos2;
+!      mbstate_t *ps2;
+  {
+    int i, w1, w2;
+***************
+*** 277,282 ****
+  	  /* clear the state of the byte sequence, because
+  	     in this case effect of mbstate is undefined  */
+! 	  memset (ps, 0, sizeof (mbstate_t));
+  	}
+        else
+  	pos += tmp;
+--- 282,290 ----
+  	  /* clear the state of the byte sequence, because
+  	     in this case effect of mbstate is undefined  */
+! 	  if (ps)
+! 	    memset (ps, 0, sizeof (mbstate_t));
+  	}
++       else if (tmp == 0)
++ 	pos++;
+        else
+  	pos += tmp;
+			     BASH PATCH REPORT
+			     =================
+
+Bash-Release: 2.05b
+Patch-ID: bash205b-006
+
+Bug-Reported-by:	clowenst@ucsd.edu
+Bug-Reference-ID:	<156388ec.0212021151.51a48df1@posting.google.com>
+Bug-Reference-URL:	
+
+Bug-Description:
+
+When running in a locale with multibyte characters, the readline display
+updater will use carriage returns when drawing the line, overwriting any
+partial output already on the screen and not terminated by a newline.
+
+Patch:
+
+*** ../bash-2.05b/lib/readline/display.c	Tue Jun  4 10:54:47 2002
+--- lib/readline/display.c	Fri Sep 13 16:22:57 2002
+***************
+*** 71,75 ****
+  
+  #if defined (HANDLE_MULTIBYTE)
+! static int _rl_col_width PARAMS((char *, int, int));
+  static int *_rl_wrapped_line;
+  #else
+--- 71,75 ----
+  
+  #if defined (HANDLE_MULTIBYTE)
+! static int _rl_col_width PARAMS((const char *, int, int));
+  static int *_rl_wrapped_line;
+  #else
+***************
+*** 1349,1355 ****
+  	      _rl_output_some_chars (nfd + lendiff, temp - lendiff);
+  #if 0
+- 	      _rl_last_c_pos += _rl_col_width (nfd+lendiff, 0, temp-lendiff) - col_lendiff;
+- #else
+  	      _rl_last_c_pos += _rl_col_width (nfd+lendiff, 0, temp-col_lendiff);
+  #endif
+  	    }
+--- 1349,1355 ----
+  	      _rl_output_some_chars (nfd + lendiff, temp - lendiff);
+  #if 0
+  	      _rl_last_c_pos += _rl_col_width (nfd+lendiff, 0, temp-col_lendiff);
++ #else
++ 	      _rl_last_c_pos += _rl_col_width (nfd+lendiff, 0, temp-lendiff);
+  #endif
+  	    }
+***************
+*** 1511,1516 ****
+    /* If we have multibyte characters, NEW is indexed by the buffer point in
+       a multibyte string, but _rl_last_c_pos is the display position.  In
+!      this case, NEW's display position is not obvious. */
+!   if ((MB_CUR_MAX == 1 || rl_byte_oriented ) && _rl_last_c_pos == new) return;
+  #else
+    if (_rl_last_c_pos == new) return;
+--- 1511,1523 ----
+    /* If we have multibyte characters, NEW is indexed by the buffer point in
+       a multibyte string, but _rl_last_c_pos is the display position.  In
+!      this case, NEW's display position is not obvious and must be
+!      calculated. */
+!   if (MB_CUR_MAX == 1 || rl_byte_oriented)
+!     {
+!       if (_rl_last_c_pos == new)
+! 	return;
+!     }
+!   else if (_rl_last_c_pos == _rl_col_width (data, 0, new))
+!     return;
+  #else
+    if (_rl_last_c_pos == new) return;
+***************
+*** 1595,1603 ****
+      {
+        if (MB_CUR_MAX > 1 && rl_byte_oriented == 0)
+! 	{
+! 	  tputs (_rl_term_cr, 1, _rl_output_character_function);
+! 	  for (i = 0; i < new; i++)
+! 	    putc (data[i], rl_outstream);
+! 	}
+        else
+  	_rl_backspace (_rl_last_c_pos - new);
+--- 1602,1606 ----
+      {
+        if (MB_CUR_MAX > 1 && rl_byte_oriented == 0)
+! 	_rl_backspace (_rl_last_c_pos - _rl_col_width (data, 0, new));
+        else
+  	_rl_backspace (_rl_last_c_pos - new);
+***************
+*** 2118,2122 ****
+  static int
+  _rl_col_width (str, start, end)
+!      char *str;
+       int start, end;
+  {
+--- 2121,2125 ----
+  static int
+  _rl_col_width (str, start, end)
+!      const char *str;
+       int start, end;
+  {
+***************
+*** 2194,2196 ****
+  }
+  #endif /* HANDLE_MULTIBYTE */
+- 	  
+--- 2197,2198 ----
+			     BASH PATCH REPORT
+			     =================
+
+Bash-Release: 2.05b
+Patch-ID:  bash205b-007
+
+Bug-Reported-by:	dman@dman.ddts.net
+Bug-Reference-ID:	<15893.26358.129589.503364@gargle.gargle.HOWL>
+Bug-Reference-URL:	http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=175127
+
+Bug-Description:
+
+Using the vi editing mode's case-changing commands in a locale with
+multibyte characters will cause garbage characters to be inserted into
+the editing buffer.
+
+Patch:
+
+*** ../bash-2.05b/lib/readline/vi_mode.c	Thu May 23 13:27:58 2002
+--- lib/readline/vi_mode.c	Tue Feb  4 15:11:07 2003
+***************
+*** 681,685 ****
+  {
+    wchar_t wc;
+!   char mb[MB_LEN_MAX];
+    mbstate_t ps;
+  
+--- 681,686 ----
+  {
+    wchar_t wc;
+!   char mb[MB_LEN_MAX+1];
+!   int mblen;
+    mbstate_t ps;
+  
+***************
+*** 704,708 ****
+        if (wc)
+  	{
+! 	  wctomb (mb, wc);
+  	  rl_begin_undo_group ();
+  	  rl_delete (1, 0);
+--- 705,711 ----
+        if (wc)
+  	{
+! 	  mblen = wctomb (mb, wc);
+! 	  if (mblen >= 0)
+! 	    mb[mblen] = '\0';
+  	  rl_begin_undo_group ();
+  	  rl_delete (1, 0);
+			     BASH PATCH REPORT
+			     =================
+
+Bash-Release: 2.05b
+Patch-ID: bash205b-008
+
+Bug-Reported-by:	Stephane Chazelas <stephane.chazelas@gmail.com>
+Bug-Reference-ID:
+Bug-Reference-URL:
+
+Bug-Description:
+
+Under certain circumstances, bash will execute user code while processing the
+environment for exported function definitions.
+
+Patch:
+
+*** ../bash-2.05b.07/builtins/common.h	2002-05-10 12:25:08.000000000 -0400
+--- builtins/common.h	2014-09-25 10:18:20.000000000 -0400
+***************
+*** 33,36 ****
+--- 33,38 ----
+  
+  /* Flags for describe_command, shared between type.def and command.def */
++ #define SEVAL_FUNCDEF	0x080		/* only allow function definitions */
++ #define SEVAL_ONECMD	0x100		/* only allow a single command */
+  #define CDESC_ALL		0x001	/* type -a */
+  #define CDESC_SHORTDESC		0x002	/* command -V */
+*** ../bash-2.05b.07/builtins/evalstring.c	2002-04-04 13:38:50.000000000 -0500
+--- builtins/evalstring.c	2014-09-25 10:18:20.000000000 -0400
+***************
+*** 205,208 ****
+--- 205,216 ----
+  	      struct fd_bitmap *bitmap;
+  
++ 	      if ((flags & SEVAL_FUNCDEF) && command->type != cm_function_def)
++ 		{
++ 		  internal_warning ("%s: ignoring function definition attempt", from_file);
++ 		  should_jump_to_top_level = 0;
++ 		  last_result = last_command_exit_value = EX_BADUSAGE;
++ 		  break;
++ 		}
++ 
+  	      bitmap = new_fd_bitmap (FD_BITMAP_SIZE);
+  	      begin_unwind_frame ("pe_dispose");
+***************
+*** 256,259 ****
+--- 264,270 ----
+  	      dispose_fd_bitmap (bitmap);
+  	      discard_unwind_frame ("pe_dispose");
++ 
++ 	      if (flags & SEVAL_ONECMD)
++ 		break;
+  	    }
+  	}
+*** ../bash-2.05b.07/variables.c	2002-06-25 09:43:33.000000000 -0400
+--- variables.c	2014-09-25 10:18:20.000000000 -0400
+***************
+*** 270,279 ****
+  	  strcpy (temp_string + char_index + 1, string);
+  
+! 	  parse_and_execute (temp_string, name, SEVAL_NONINT|SEVAL_NOHIST);
+! 
+! 	  /* Ancient backwards compatibility.  Old versions of bash exported
+! 	     functions like name()=() {...} */
+! 	  if (name[char_index - 1] == ')' && name[char_index - 2] == '(')
+! 	    name[char_index - 2] = '\0';
+  
+  	  if (temp_var = find_function (name))
+--- 270,277 ----
+  	  strcpy (temp_string + char_index + 1, string);
+  
+! 	  /* Don't import function names that are invalid identifiers from the
+! 	     environment. */
+! 	  if (legal_identifier (name))
+! 	    parse_and_execute (temp_string, name, SEVAL_NONINT|SEVAL_NOHIST|SEVAL_FUNCDEF|SEVAL_ONECMD);
+  
+  	  if (temp_var = find_function (name))
+***************
+*** 284,291 ****
+  	  else
+  	    report_error ("error importing function definition for `%s'", name);
+- 
+- 	  /* ( */
+- 	  if (name[char_index - 1] == ')' && name[char_index - 2] == '\0')
+- 	    name[char_index - 2] = '(';		/* ) */
+  	}
+  #if defined (ARRAY_VARS)
+--- 282,285 ----
+			     BASH PATCH REPORT
+			     =================
+
+Bash-Release: 2.05b
+Patch-ID: bash205b-009
+
+Bug-Reported-by:	Tavis Ormandy <taviso@cmpxchg8b.com>
+Bug-Reference-ID:
+Bug-Reference-URL:	http://twitter.com/taviso/statuses/514887394294652929
+
+Bug-Description:
+
+Under certain circumstances, bash can incorrectly save a lookahead character and
+return it on a subsequent call, even when reading a new line.
+
+Patch:
+
+*** ../bash-2.05b.08/parse.y	2002-05-21 11:57:30.000000000 -0400
+--- parse.y	2014-09-25 16:46:51.000000000 -0400
+***************
+*** 2356,2359 ****
+--- 2356,2361 ----
+    word_desc_to_read = (WORD_DESC *)NULL;
+  
++   eol_ungetc_lookahead = 0;
++ 
+    last_read_token = '\n';
+    token_to_read = '\n';
+			     BASH PATCH REPORT
+			     =================
+
+Bash-Release: 2.05b
+Patch-ID: bash205b-010
+
+Bug-Reported-by:	Florian Weimer <fweimer@redhat.com>
+Bug-Reference-ID:
+Bug-Reference-URL:
+
+Bug-Description:
+
+This patch changes the encoding bash uses for exported functions to avoid
+clashes with shell variables and to avoid depending only on an environment
+variable's contents to determine whether or not to interpret it as a shell
+function.
+
+Patch:
+
+*** ../bash-2.05b.09/variables.c	2014-09-25 10:18:20.000000000 -0400
+--- variables.c	2014-09-27 21:03:53.000000000 -0400
+***************
+*** 70,73 ****
+--- 70,78 ----
+  #define ifsname(s)	((s)[0] == 'I' && (s)[1] == 'F' && (s)[2] == 'S' && (s)[3] == '\0')
+  
++ #define BASHFUNC_PREFIX		"BASH_FUNC_"
++ #define BASHFUNC_PREFLEN	10	/* == strlen(BASHFUNC_PREFIX */
++ #define BASHFUNC_SUFFIX		"%%"
++ #define BASHFUNC_SUFFLEN	2	/* == strlen(BASHFUNC_SUFFIX) */
++ 
+  /* Variables used here and defined in other files. */
+  extern int posixly_correct;
+***************
+*** 204,208 ****
+  static void dispose_temporary_env __P((sh_free_func_t *));     
+  
+! static inline char *mk_env_string __P((const char *, const char *));
+  static char **make_env_array_from_var_list __P((SHELL_VAR **));
+  static char **make_var_export_array __P((VAR_CONTEXT *));
+--- 209,213 ----
+  static void dispose_temporary_env __P((sh_free_func_t *));     
+  
+! static inline char *mk_env_string __P((const char *, const char *, int));
+  static char **make_env_array_from_var_list __P((SHELL_VAR **));
+  static char **make_var_export_array __P((VAR_CONTEXT *));
+***************
+*** 261,279 ****
+        /* If exported function, define it now.  Don't import functions from
+  	 the environment in privileged mode. */
+!       if (privmode == 0 && read_but_dont_execute == 0 && STREQN ("() {", string, 4))
+  	{
+  	  string_length = strlen (string);
+! 	  temp_string = (char *)xmalloc (3 + string_length + char_index);
+  
+! 	  strcpy (temp_string, name);
+! 	  temp_string[char_index] = ' ';
+! 	  strcpy (temp_string + char_index + 1, string);
+  
+  	  /* Don't import function names that are invalid identifiers from the
+  	     environment. */
+! 	  if (legal_identifier (name))
+! 	    parse_and_execute (temp_string, name, SEVAL_NONINT|SEVAL_NOHIST|SEVAL_FUNCDEF|SEVAL_ONECMD);
+  
+! 	  if (temp_var = find_function (name))
+  	    {
+  	      VSETATTR (temp_var, (att_exported|att_imported));
+--- 266,295 ----
+        /* If exported function, define it now.  Don't import functions from
+  	 the environment in privileged mode. */
+!       if (privmode == 0 && read_but_dont_execute == 0 &&
+! 	  STREQN (BASHFUNC_PREFIX, name, BASHFUNC_PREFLEN) &&
+! 	  STREQ (BASHFUNC_SUFFIX, name + char_index - BASHFUNC_SUFFLEN) &&
+! 	  STREQN ("() {", string, 4))
+  	{
++ 	  size_t namelen;
++ 	  char *tname;		/* desired imported function name */
++ 
++ 	  namelen = char_index - BASHFUNC_PREFLEN - BASHFUNC_SUFFLEN;
++ 
++ 	  tname = name + BASHFUNC_PREFLEN;	/* start of func name */
++ 	  tname[namelen] = '\0';		/* now tname == func name */
++ 
+  	  string_length = strlen (string);
+! 	  temp_string = (char *)xmalloc (namelen + string_length + 2);
+  
+! 	  memcpy (temp_string, tname, namelen);
+! 	  temp_string[namelen] = ' ';
+! 	  memcpy (temp_string + namelen + 1, string, string_length + 1);
+  
+  	  /* Don't import function names that are invalid identifiers from the
+  	     environment. */
+! 	  if (absolute_program (tname) == 0 && (posixly_correct == 0 || legal_identifier (tname)))
+! 	    parse_and_execute (temp_string, tname, SEVAL_NONINT|SEVAL_NOHIST|SEVAL_FUNCDEF|SEVAL_ONECMD);
+  
+! 	  if (temp_var = find_function (tname))
+  	    {
+  	      VSETATTR (temp_var, (att_exported|att_imported));
+***************
+*** 281,285 ****
+  	    }
+  	  else
+! 	    report_error ("error importing function definition for `%s'", name);
+  	}
+  #if defined (ARRAY_VARS)
+--- 297,304 ----
+  	    }
+  	  else
+! 	    report_error ("error importing function definition for `%s'", tname);
+! 
+! 	  /* Restore original suffix */
+! 	  tname[namelen] = BASHFUNC_SUFFIX[0];
+  	}
+  #if defined (ARRAY_VARS)
+***************
+*** 1924,1928 ****
+  
+    INVALIDATE_EXPORTSTR (var);
+!   var->exportstr = mk_env_string (name, value);
+  
+    array_needs_making = 1;
+--- 1943,1947 ----
+  
+    INVALIDATE_EXPORTSTR (var);
+!   var->exportstr = mk_env_string (name, value, 0);
+  
+    array_needs_making = 1;
+***************
+*** 2682,2700 ****
+  
+  static inline char *
+! mk_env_string (name, value)
+       const char *name, *value;
+  {
+!   int name_len, value_len;
+!   char	*p;
+  
+    name_len = strlen (name);
+    value_len = STRLEN (value);
+!   p = (char *)xmalloc (2 + name_len + value_len);
+!   strcpy (p, name);
+!   p[name_len] = '=';
+    if (value && *value)
+!     strcpy (p + name_len + 1, value);
+    else
+!     p[name_len + 1] = '\0';
+    return (p);
+  }
+--- 2701,2740 ----
+  
+  static inline char *
+! mk_env_string (name, value, isfunc)
+       const char *name, *value;
++      int isfunc;
+  {
+!   size_t name_len, value_len;
+!   char	*p, *q;
+  
+    name_len = strlen (name);
+    value_len = STRLEN (value);
+! 
+!   /* If we are exporting a shell function, construct the encoded function
+!      name. */
+!   if (isfunc && value)
+!     {
+!       p = (char *)xmalloc (BASHFUNC_PREFLEN + name_len + BASHFUNC_SUFFLEN + value_len + 2);
+!       q = p;
+!       memcpy (q, BASHFUNC_PREFIX, BASHFUNC_PREFLEN);
+!       q += BASHFUNC_PREFLEN;
+!       memcpy (q, name, name_len);
+!       q += name_len;
+!       memcpy (q, BASHFUNC_SUFFIX, BASHFUNC_SUFFLEN);
+!       q += BASHFUNC_SUFFLEN;
+!     }
+!   else
+!     {
+!       p = (char *)xmalloc (2 + name_len + value_len);
+!       memcpy (p, name, name_len);
+!       q = p + name_len;
+!     }
+! 
+!   q[0] = '=';
+    if (value && *value)
+!     memcpy (q + 1, value, value_len + 1);
+    else
+!     q[1] = '\0';
+! 
+    return (p);
+  }
+***************
+*** 2771,2775 ****
+  	     using the cached exportstr... */
+  	  list[list_index] = USE_EXPORTSTR ? savestring (value)
+! 					   : mk_env_string (var->name, value);
+  
+  	  if (USE_EXPORTSTR == 0)
+--- 2811,2815 ----
+  	     using the cached exportstr... */
+  	  list[list_index] = USE_EXPORTSTR ? savestring (value)
+! 					   : mk_env_string (var->name, value, function_p (var));
+  
+  	  if (USE_EXPORTSTR == 0)
+			     BASH PATCH REPORT
+			     =================
+
+Bash-Release: 2.05b
+Patch-ID: bash205b-011
+
+Bug-Reported-by:	Florian Weimer <fweimer@redhat.com>
+Bug-Reference-ID:
+Bug-Reference-URL:
+
+Bug-Description:
+
+There are two local buffer overflows in parse.y that can cause the shell
+to dump core when given many here-documents attached to a single command
+or many nested loops.
+
+Patch:
+
+*** ../bash-2.05b.10/parse.y	2014-09-25 16:46:51.000000000 -0400
+--- parse.y	2014-09-30 19:58:09.000000000 -0400
+***************
+*** 162,165 ****
+--- 162,168 ----
+  static int reserved_word_acceptable __P((int));
+  static int yylex __P((void));
++ 
++ static void push_heredoc __P((REDIRECT *));
++ static char *mk_alexpansion __P((char *));
+  static int alias_expand_token __P((char *));
+  static int time_command_acceptable __P((void));
+***************
+*** 249,253 ****
+  /* Variables to manage the task of reading here documents, because we need to
+     defer the reading until after a complete command has been collected. */
+! static REDIRECT *redir_stack[10];
+  int need_here_doc;
+  
+--- 252,258 ----
+  /* Variables to manage the task of reading here documents, because we need to
+     defer the reading until after a complete command has been collected. */
+! #define HEREDOC_MAX 16
+! 
+! static REDIRECT *redir_stack[HEREDOC_MAX];
+  int need_here_doc;
+  
+***************
+*** 405,409 ****
+  			  redir.filename = $2;
+  			  $$ = make_redirection (0, r_reading_until, redir);
+! 			  redir_stack[need_here_doc++] = $$;
+  			}
+  	|	NUMBER LESS_LESS WORD
+--- 410,414 ----
+  			  redir.filename = $2;
+  			  $$ = make_redirection (0, r_reading_until, redir);
+! 			  push_heredoc ($$);
+  			}
+  	|	NUMBER LESS_LESS WORD
+***************
+*** 411,415 ****
+  			  redir.filename = $3;
+  			  $$ = make_redirection ($1, r_reading_until, redir);
+! 			  redir_stack[need_here_doc++] = $$;
+  			}
+  	|	LESS_LESS_LESS WORD
+--- 416,420 ----
+  			  redir.filename = $3;
+  			  $$ = make_redirection ($1, r_reading_until, redir);
+! 			  push_heredoc ($$);
+  			}
+  	|	LESS_LESS_LESS WORD
+***************
+*** 468,472 ****
+  			  $$ = make_redirection
+  			    (0, r_deblank_reading_until, redir);
+! 			  redir_stack[need_here_doc++] = $$;
+  			}
+  	|	NUMBER LESS_LESS_MINUS WORD
+--- 473,477 ----
+  			  $$ = make_redirection
+  			    (0, r_deblank_reading_until, redir);
+! 			  push_heredoc ($$);
+  			}
+  	|	NUMBER LESS_LESS_MINUS WORD
+***************
+*** 475,479 ****
+  			  $$ = make_redirection
+  			    ($1, r_deblank_reading_until, redir);
+! 			  redir_stack[need_here_doc++] = $$;
+  			}
+  	|	GREATER_AND '-'
+--- 480,484 ----
+  			  $$ = make_redirection
+  			    ($1, r_deblank_reading_until, redir);
+! 			  push_heredoc ($$);
+  			}
+  	|	GREATER_AND '-'
+***************
+*** 2090,2093 ****
+--- 2095,2113 ----
+  static int esacs_needed_count;
+  
++ static void
++ push_heredoc (r)
++      REDIRECT *r;
++ {
++   if (need_here_doc >= HEREDOC_MAX)
++     {
++       last_command_exit_value = EX_BADUSAGE;
++       need_here_doc = 0;
++       report_syntax_error ("maximum here-document count exceeded");
++       reset_parser ();
++       exit_shell (last_command_exit_value);
++     }
++   redir_stack[need_here_doc++] = r;
++ }
++ 
+  void
+  gather_here_documents ()
+			     BASH PATCH REPORT
+			     =================
+
+Bash-Release: 2.05b
+Patch-ID: bash205b-012
+
+Bug-Reported-by:	Michal Zalewski <lcamtuf@coredump.cx>
+Bug-Reference-ID:
+Bug-Reference-URL:
+
+Bug-Description:
+
+When bash is parsing a function definition that contains a here-document
+delimited by end-of-file (or end-of-string), it leaves the closing delimiter
+uninitialized.  This can result in an invalid memory access when the parsed
+function is later copied.
+
+Patch:
+
+*** ../bash-2.05b.11/make_cmd.c	2002-05-06 13:37:02.000000000 -0400
+--- make_cmd.c	2014-10-02 11:58:30.000000000 -0400
+***************
+*** 650,653 ****
+--- 650,654 ----
+    temp->redirector = source;
+    temp->redirectee = dest_and_filename;
++   temp->here_doc_eof = 0;
+    temp->instruction = instruction;
+    temp->flags = 0;
+*** ../bash-2.05b.11/copy_cmd.c	2002-03-12 14:41:03.000000000 -0500
+--- copy_cmd.c	2014-10-02 11:58:30.000000000 -0400
+***************
+*** 118,122 ****
+      case r_reading_until:
+      case r_deblank_reading_until:
+!       new_redirect->here_doc_eof = savestring (redirect->here_doc_eof);
+        /*FALLTHROUGH*/
+      case r_reading_string:
+--- 118,122 ----
+      case r_reading_until:
+      case r_deblank_reading_until:
+!       new_redirect->here_doc_eof = redirect->here_doc_eof ? savestring (redirect->here_doc_eof) : 0;
+        /*FALLTHROUGH*/
+      case r_reading_string:
+EOF

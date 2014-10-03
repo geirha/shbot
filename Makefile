@@ -5,25 +5,25 @@ shells = build/bin/bash+ build/bin/mksh build/bin/bsh
 bash1_version = 1.14.7
 shells += build/bin/bash1
 
-bash25a_version = 2.05a
+bash25a_version = 2.05a.0
 shells += build/bin/bash25a
-bash25b_version = 2.05b
+bash25b_version = 2.05b.12
 shells += build/bin/bash25b
 
-bash30_version = 3.0.16
+bash30_version = 3.0.21
 shells += build/bin/bash30
-bash31_version = 3.1.17
+bash31_version = 3.1.22
 shells += build/bin/bash31
-bash32_version = 3.2.48
+bash32_version = 3.2.56
 shells += build/bin/bash32
 
-bash40_version = 4.0.38
+bash40_version = 4.0.43
 shells += build/bin/bash40
-bash41_version = 4.1.11
+bash41_version = 4.1.16
 shells += build/bin/bash41
-bash42_version = 4.2.45
+bash42_version = 4.2.52
 shells += build/bin/bash42
-bash43_version = 4.3.18
+bash43_version = 4.3.29
 shells += build/bin/bash43
 
 awks = build/bin/bwk build/bin/gawk3 build/bin/gawk4 build/bin/mawk \
