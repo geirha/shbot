@@ -289,7 +289,8 @@ declare -A commands='(
 
     ## Built with build-bash and build-awk
     [bash1]="GNU Bourne-Again SHell 1.14.7"
-    [bash2]="GNU Bourne-Again SHell 2.05b"
+    [bash25a]="GNU Bourne-Again SHell 2.05a"
+    [bash25b]="GNU Bourne-Again SHell 2.05b"
     [bash30]="GNU Bourne-Again SHell 3.0.16"
     [bash31]="GNU Bourne-Again SHell 3.1.17"
     [bash32]="GNU Bourne-Again SHell 3.2.48"
@@ -375,6 +376,11 @@ cp "$(ldconfig -p|awk '$1=="libnss_compat.so.2"{print $NF;exit}')" "initramfs/li
 } > initramfs/usr/bin/loadables
 
 shopt -s nullglob
+# find latest bash 2.x
+for f in initramfs/bin/bash25[ab]; do :; done
+ln -sf "${f##*/}" initramfs/bin/bash2
+manpages[bash2]=${manpages[${f##*/}]}
+
 # find latest bash 3.x
 for f in initramfs/bin/bash3?; do :; done
 ln -sf "${f##*/}" initramfs/bin/bash3

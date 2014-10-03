@@ -5,8 +5,10 @@ shells = build/bin/bash+ build/bin/mksh build/bin/bsh
 bash1_version = 1.14.7
 shells += build/bin/bash1
 
-bash2_version = 2.05b
-shells += build/bin/bash2
+bash25a_version = 2.05a
+shells += build/bin/bash25a
+bash25b_version = 2.05b
+shells += build/bin/bash25b
 
 bash30_version = 3.0.16
 shells += build/bin/bash30
@@ -62,8 +64,10 @@ sources/mksh:
 
 build/bin/bash1: build/bash-$(bash1_version)
 	scripts/build-shell bash $(bash1_version) bash1
-build/bin/bash2: build/bash-$(bash2_version)
-	scripts/build-shell bash $(bash2_version) bash2
+build/bin/bash25a: build/bash-$(bash25a_version)
+	scripts/build-shell bash $(bash25a_version) bash25a
+build/bin/bash25b: build/bash-$(bash25b_version)
+	scripts/build-shell bash $(bash25b_version) bash25b
 build/bin/bash30: build/bash-$(bash30_version)
 	scripts/build-shell bash $(bash30_version) bash30
 build/bin/bash31: build/bash-$(bash31_version)
