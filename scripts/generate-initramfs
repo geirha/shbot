@@ -300,7 +300,6 @@ declare -A commands='(
     [bash43]="GNU Bourne-Again SHell 4.3.x"
     [bash+]="GNU Bourne-Again Shell devel branch"
     [bsh]="the standard command interpreter"
-    [bwk]="pattern-directed scanning and processing language"
     [gawk3]="pattern scanning and processing language"
     [gawk4]="pattern scanning and processing language"
     [mawk]="pattern scanning and text processing language"
@@ -413,7 +412,7 @@ done
 ln -sf gawk4 initramfs/bin/gawk || exit
 manpages[gawk]=${manpages[gawk4]}
 
-for awk in nawk mawk gawk oawk bwk; do
+for awk in nawk mawk gawk oawk; do
     [[ -e initramfs/bin/$awk ]] || continue;
     ln -sf "$awk" initramfs/bin/awk
     manpages[awk]=${manpages[$awk]}

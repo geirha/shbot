@@ -26,7 +26,7 @@ shells += build/bin/bash42
 bash43_version = 4.3.29
 shells += build/bin/bash43
 
-awks = build/bin/bwk build/bin/gawk3 build/bin/gawk4 build/bin/mawk \
+awks = build/bin/gawk3 build/bin/gawk4 build/bin/mawk \
        build/bin/nawk build/bin/oawk
 
 evalbot: hda
