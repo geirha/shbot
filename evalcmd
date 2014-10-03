@@ -1,32 +1,36 @@
 #!/bin/bash
 
 processHooks() {
-	if [[ -f manpages && $2 = "man "[![:blank:]]* ]]; then
-		local cmd args manpages
-		read -r cmd args <<< "$2"
-		source ./manpages &&
-		if [[ ${manpages[$args]} ]]; then
-			printf '%s: %s\n' "$2" "${manpages[$args]}"
-			exit
-		fi
-	elif [[ -f helppages && $2 = "help "[![:blank:]]*  ]]; then
-		local cmd args helppages
-		read -r cmd args <<< "$2"
-		source ./helppages &&
-		if [[ ${helppages[$args]} ]]; then
-			printf '%s\n' "${helppages[$args]}"
-			exit
-		fi
-	elif [[ $2 = trigger?(s) ]]; then
-		printf 'Available triggers: '
+    if [[ -f manpages && $2 = "man "[![:blank:]]* ]]; then
+        local cmd args manpages
+        read -r cmd args <<< "$2"
+        source ./manpages &&
+        if [[ ${manpages[$args]} ]]; then
+            printf '%s: %s\n' "$2" "${manpages[$args]}"
+            exit
+        fi
+    elif [[ -f helppages && $2 = "help "[![:blank:]]*  ]]; then
+        local cmd args helppages
+        read -r cmd args <<< "$2"
+        source ./helppages &&
+        if [[ ${helppages[$args]} ]]; then
+            printf '%s\n' "${helppages[$args]}"
+            exit
+        fi
+    elif [[ $2 = trigger?(s) ]]; then
+        printf 'Available triggers: '
 
-		local idx
-		for idx in "${!triggers[@]}"; do
-			printf '%s: %s; ' "$idx" "${triggers[$idx]}" 
-		done
+        local x limit=5 idx v
+        for idx in "${indices[@]}"; do
+            v=${versions[$idx]} x=0
+            while [[ $v = *\# ]] && (( x++ < limit )); do
+                v=${versions[$v]}
+            done
+            printf '%s %s; ' "$idx" "$v"
+        done
 
-		exit
-	fi
+        exit
+    fi
 }
 
 if [[ $1 = -n ]]; then
@@ -34,10 +38,13 @@ if [[ $1 = -n ]]; then
     shift
 fi
 
-t=${1:-4}
-declare -A triggers='()'
-while read -r trigger shell; do
+t=${1:-4}\#
+declare -A triggers='()' versions='()'
+indices=()
+while IFS=$'\t' read -r trigger shell version; do
     triggers[$trigger]=$shell
+    versions[$trigger]=$version
+    indices+=("$trigger")  # to keep the order
 done < ./triggers
 [[ ${triggers[$t]} ]] || exit
 
