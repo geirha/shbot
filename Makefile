@@ -66,44 +66,44 @@ sources/mksh:
 
 build/bin/bash1: build/bash-$(bash1_version)
 	scripts/build-shell bash $(bash1_version) bash1
-	scripts/add-trigger '1#' "setsid bash1 -login" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
+	scripts/add-trigger '1#' "ln -sf bash1 /bin/bash;setsid bash -login" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
 build/bin/bash25: build/bash-$(bash25_version)
 	scripts/build-shell bash $(bash25_version) bash25
-	scripts/add-trigger '25#' "setsid bash25 --login" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
+	scripts/add-trigger '25#' "ln -sf bash25 /bin/bash;setsid bash --login" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
 build/bin/bash25a: build/bash-$(bash25a_version)
 	scripts/build-shell bash $(bash25a_version) bash25a
-	scripts/add-trigger '25a#' "setsid bash25a --login" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
+	scripts/add-trigger '25a#' "ln -sf bash25a /bin/bash;setsid bash --login" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
 build/bin/bash25b: build/bash-$(bash25b_version)
 	scripts/build-shell bash $(bash25b_version) bash25b
-	scripts/add-trigger '25b#' "setsid bash25b -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')" \
-	                    '2#'   "setsid bash2 -l"   "25b#"
+	scripts/add-trigger '25b#' "ln -sf bash25b /bin/bash;setsid bash -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')" \
+	                    '2#'   "ln -sf bash2 /bin/bash;setsid bash -l"   "25b#"
 build/bin/bash30: build/bash-$(bash30_version)
 	scripts/build-shell bash $(bash30_version) bash30
-	scripts/add-trigger '30#' "setsid bash30 -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
+	scripts/add-trigger '30#' "ln -sf bash30 /bin/bash;setsid bash -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
 build/bin/bash31: build/bash-$(bash31_version)
 	scripts/build-shell bash $(bash31_version) bash31
-	scripts/add-trigger '31#' "setsid bash31 -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
+	scripts/add-trigger '31#' "ln -sf bash31 /bin/bash;setsid bash -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
 build/bin/bash32: build/bash-$(bash32_version)
 	scripts/build-shell bash $(bash32_version) bash32
-	scripts/add-trigger '32#' "setsid bash32 -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')" \
-	                    '3#'  "setsid bash3 -l"  "32#"
+	scripts/add-trigger '32#' "ln -sf bash32 /bin/bash;setsid bash -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')" \
+	                    '3#'  "ln -sf bash3 /bin/bash;setsid bash -l"  "32#"
 build/bin/bash40: build/bash-$(bash40_version)
 	scripts/build-shell bash $(bash40_version) bash40
-	scripts/add-trigger '40#' "setsid bash40 -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
+	scripts/add-trigger '40#' "ln -sf bash40 /bin/bash;setsid bash -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
 build/bin/bash41: build/bash-$(bash41_version)
 	scripts/build-shell bash $(bash41_version) bash41
-	scripts/add-trigger '41#' "setsid bash41 -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
+	scripts/add-trigger '41#' "ln -sf bash41 /bin/bash;setsid bash -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
 build/bin/bash42: build/bash-$(bash42_version)
 	scripts/build-shell bash $(bash42_version) bash42
-	scripts/add-trigger '42#' "setsid bash42 -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
+	scripts/add-trigger '42#' "ln -sf bash42 /bin/bash;setsid bash -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
 build/bin/bash43: build/bash-$(bash43_version)
 	scripts/build-shell bash $(bash43_version) bash43
-	scripts/add-trigger '43#' "setsid bash43 -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')" \
-	                    '4#'  "setsid bash4 -l"  "43#" \
+	scripts/add-trigger '43#' "ln -sf bash43 /bin/bash;setsid bash -l" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')" \
+	                    '4#'  "ln -sf bash4 /bin/bash;setsid bash -l"  "43#" \
 	                    '#'   "setsid bash -l"  "4#"
 build/bin/bash+: build/bash-devel
 	scripts/build-shell bash devel bash+
-	scripts/add-trigger '+#' "setsid bash+ -l" "bash-devel"
+	scripts/add-trigger '+#' "ln -sf bash+ /bin/bash;setsid bash -l" "bash-devel"
 build/bin/bsh:
 	scripts/build-shell bourne 050706 bsh
 	scripts/add-trigger 'b#' "PS1= TIMEOUT=1 exec -l bsh -i" "bourne" \
