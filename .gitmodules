@@ -1,3 +1,6 @@
 [submodule "bash"]
 	path = bash
 	url = git://git.savannah.gnu.org/bash.git
+[submodule "dash"]
+	path = dash
+	url = git://git.kernel.org/pub/scm/utils/dash/dash.git

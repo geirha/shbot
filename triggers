@@ -15,8 +15,8 @@
 42#	ln -sf bash42 /bin/bash;setsid bash -l	bash-4.2
 43#	ln -sf bash43 /bin/bash;setsid bash -l	bash-4.3
 b#	PS1= TIMEOUT=1 exec -l bsh -i	bourne
-d#	setsid dash -l			dash-0.5.7
+d#	setsid dash -l	dash-0.5.8
 j#	PS1= TIMEOUT=1 exec -l jsh -i	bourne(w/job)
 k#	setsid ksh -l			ksh93
 m#	setsid mksh -l	mksh R50
-sh#	setsid sh -l			d#
+sh#	setsid sh -l	d#

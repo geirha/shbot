@@ -28,6 +28,9 @@ shells += build/bin/bash42
 bash43_version = 4.3.29
 shells += build/bin/bash43
 
+dash_version = 0.5.8
+shells += build/bin/dash
+
 awks = build/bin/gawk3 build/bin/gawk4 build/bin/mawk \
        build/bin/nawk build/bin/oawk
 
@@ -61,9 +64,16 @@ clean:
 build/bash-%:
 	scripts/extract-from-git "$@"
 
+build/dash-%:
+	scripts/extract-from-git "$@"
+
 sources/mksh:
 	env CVS_RSH=ssh cvs -qd _anoncvs@anoncvs.mirbsd.org:/cvs co -PAd "$@" mksh
 
+build/bin/dash: build/dash-$(dash_version)
+	scripts/build-shell dash "$(dash_version)" dash
+	scripts/add-trigger 'd#'  'setsid dash -l' "dash-0.5.8" \
+						'sh#' 'setsid sh -l'   "d#"
 build/bin/bash1: build/bash-$(bash1_version)
 	scripts/build-shell bash $(bash1_version) bash1
 	scripts/add-trigger '1#' "ln -sf bash1 /bin/bash;setsid bash -login" "bash-$$("$@" -c 'echo "$${BASH_VERSION%.*}"')"
