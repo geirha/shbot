@@ -2,6 +2,7 @@
 +#	setsid bash+ -l	bash-devel
 1#	setsid bash1 -login	bash-1.14.7
 2#	setsid bash2 -l	25b#
+25#	setsid bash25 --login	bash-2.05.0
 25a#	setsid bash25a --login	bash-2.05a.0
 25b#	setsid bash25b -l	bash-2.05b.12
 3#	setsid bash3 -l	32#

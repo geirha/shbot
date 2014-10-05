@@ -5,6 +5,7 @@ die() { local ret=$?; printf '%s\n' "$@" >&2; exit "$ret"; }
 
 declare -A versions='(
     [bash-1.14.7]=726f63884db0132f01745f1fb4465e6621088ccf
+    [bash-2.05.0]=28ef6c316f1aff914bb95ac09787a3c83c1815fd
     [bash-2.05a.0]=f73dda092b33638d2d5e9c35375f687a607b5403
     [bash-2.05b.0]=7117c2d221b2aed4ede8600f6a36b7c1454b4f55
     [bash-3.0.16]=eb87367179effbe5f430236db8259006d71438b7

@@ -5,6 +5,8 @@ shells = build/bin/bash+ build/bin/mksh build/bin/bsh
 bash1_version = 1.14.7
 shells += build/bin/bash1
 
+bash25_version = 2.05.0
+shells += build/bin/bash25
 bash25a_version = 2.05a.0
 shells += build/bin/bash25a
 bash25b_version = 2.05b.12
@@ -65,6 +67,9 @@ sources/mksh:
 build/bin/bash1: build/bash-$(bash1_version)
 	scripts/build-shell bash $(bash1_version) bash1
 	scripts/add-trigger '1#' "setsid bash1 -login" "bash-$$("$@" -c 'echo "$${BASH_VERSION%\(*}"')"
+build/bin/bash25: build/bash-$(bash25_version)
+	scripts/build-shell bash $(bash25_version) bash25
+	scripts/add-trigger '25#' "setsid bash25 --login" "bash-$$("$@" -c 'echo "$${BASH_VERSION%(*}"')"
 build/bin/bash25a: build/bash-$(bash25a_version)
 	scripts/build-shell bash $(bash25a_version) bash25a
 	scripts/add-trigger '25a#' "setsid bash25a --login" "bash-$$("$@" -c 'echo "$${BASH_VERSION%(*}"')"
