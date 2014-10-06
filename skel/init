@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash4
 shopt -s extglob
 
 chown -R root:root /

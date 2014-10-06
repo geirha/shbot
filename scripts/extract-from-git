@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # usage: extract-from-git build/bash-x.y.z
 
 die() { local ret=$?; printf '%s\n' "$@" >&2; exit "$ret"; }

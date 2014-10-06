@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/usr/bin/env bash
 shopt -s extglob
 
 shell=$1 version=$2 bin_name=${3:-$shell$version}

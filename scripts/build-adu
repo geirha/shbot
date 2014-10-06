@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 srcdir=$PWD
 wget -c -O "sources/adu.tar.Z" "http://twkm.freeshell.org/adu.tar.Z" &&

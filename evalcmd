@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 processHooks() {
     if [[ -f manpages && $2 = "man "[![:blank:]]* ]]; then
