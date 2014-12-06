@@ -20,6 +20,9 @@ declare -A versions='(
 
     # from dash repo
     [dash-0.5.8]=v0.5.8
+
+	# from posh repo
+	[posh-0.12.3]=debian/0.12.3
 )'
 
 ver=${1##*/}
@@ -52,4 +55,14 @@ elif [[ $ver = dash* ]]; then
     if [[ -x patches/$ver ]]; then
         cd "$1" && "../../patches/$ver"
     fi
+elif [[ $ver = posh* ]]; then
+	commit=${versions[$ver]?Unknown version: $ver}
+	mkdir -p "$1" || exit
+	{
+		cd sources/posh &&
+		git archive --prefix="$1/" --format=tar "$commit"
+	} | pax -r
+	if [[ -x patches/$ver ]]; then
+		cd "$1" && "../../patches/$ver"
+	fi
 fi

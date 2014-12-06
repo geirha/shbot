@@ -37,6 +37,16 @@ case $shell in
         cp src/dash.1 "../man/man1/$bin_name.1"
         exit
     ;;
+	posh)
+		cd "build/posh-$version" &&
+		aclocal &&
+		autoreconf -i &&
+		./configure &&
+		make &&
+		cp posh "../bin/$bin_name" &&
+		cp posh.1 "../man/man1/$bin_name.1"
+		exit
+	;;
     bash) : ;; #handled below
     *) exit 1;;
 esac

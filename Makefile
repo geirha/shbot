@@ -1,6 +1,6 @@
 .PHONY: clean
 
-shells = build/bin/bash+ build/bin/mksh build/bin/bsh
+shells = build/bin/bash+ build/bin/mksh build/bin/bsh 
 
 bash1_version = 1.14.7
 shells += build/bin/bash1
@@ -30,6 +30,9 @@ shells += build/bin/bash43
 
 dash_version = 0.5.8
 shells += build/bin/dash
+
+posh_version = 0.12.3
+shells += build/bin/posh
 
 awks = build/bin/gawk3 build/bin/gawk4 build/bin/mawk \
        build/bin/nawk build/bin/oawk
@@ -67,8 +70,18 @@ build/bash-%:
 build/dash-%:
 	scripts/extract-from-git "$@"
 
+build/posh-%: sources/posh
+	scripts/extract-from-git "$@"
+
+sources/posh:
+	git clone git://anonscm.debian.org/users/clint/posh.git "$@"
+
 sources/mksh:
 	env CVS_RSH=ssh cvs -qd _anoncvs@anoncvs.mirbsd.org:/cvs co -PAd "$@" mksh
+
+build/bin/posh: build/posh-$(posh_version)
+	scripts/build-shell posh "$(posh_version)" posh
+	scripts/add-trigger 'p#' 'setsid posh -l' "posh-0.12.3"
 
 build/bin/dash: build/dash-$(dash_version)
 	scripts/build-shell dash "$(dash_version)" dash
