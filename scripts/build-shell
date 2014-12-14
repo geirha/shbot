@@ -20,8 +20,7 @@ case $shell in
         cd build &&
         wget -c -O "$srcdir/sources/heirloom-sh.tar.bz2" \
             "http://sourceforge.net/projects/heirloom/files/heirloom-sh/$version/heirloom-sh-$version.tar.bz2/download" &&
-        bzip2 -cd "$srcdir/sources/heirloom-sh.tar.bz2" | 
-            pax -rs '|^[^/]*|heirloom-sh|' &&
+        bzip2 -cd "$srcdir/sources/heirloom-sh.tar.bz2" | pax -rs '|^[^/]*|heirloom-sh|' &&
         cd heirloom-sh &&
         make &&
         cp sh ../bin/$bin_name &&
