@@ -1,3 +1,0 @@
-[submodule "bash"]
-	path = bash
-	url = git://git.savannah.gnu.org/bash.git
