@@ -1,23 +1,25 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-url=$1 kernel=${url##*/} dir=${kernel%.tar.*}
-srcdir=$PWD
+if [[ $VERBOSE = 1 ]]; then
+    cp() { command cp -v "$@"; }
+    mkdir() { command mkdir -v "$@"; }
+    rm() { command rm -v "$@"; }
+fi
 
-mkdir -p sources/ build/ &&
-cd build || exit
-
-wget -c -O "$srcdir/sources/$kernel" "$url" &&
-case $kernel in
-    *.tar.xz)  xz -cd    "$srcdir/sources/$kernel" ;;
-    *.tar.bz2) bzip2 -cd "$srcdir/sources/$kernel" ;;
-    *.tar.gz)  gzip -cd  "$srcdir/sources/$kernel" ;;
-    *) exit 1 ;;
-esac | pax -r &&
 case $(uname -m) in
-    x86_64) cp ../kernel64.config "$dir/.config" ;;
-    *) cp ../kernel.config "$dir/.config" ;;
-esac &&
-cd "$dir" &&
-make silentoldconfig &&
-make &&
-cp arch/x86/boot/bzImage ../bzImage
+    x86_64) bit=64 ;;
+    *) bit=32 ;;
+esac
+kernelver=$(make -sC sources/linux kernelversion) || exit
+
+printf 'Building %d-bit linux %s.\n' "$bit" "$kernelver"
+
+rm -rf build/kernel && mkdir -p build/kernel || exit
+if (( bit == 64 )); then
+    cp kernel64.config build/kernel/.config
+else
+    cp kernel.config build/kernel/.config
+fi || exit
+make -C sources/linux silentoldconfig O="$PWD/build/kernel" &&
+make -C build/kernel &&
+cp build/kernel/arch/x86/boot/bzImage build/bzImage
