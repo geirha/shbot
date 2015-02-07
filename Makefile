@@ -50,8 +50,9 @@ initramfs.cpio.gz: initramfs
 initramfs: $(shells) $(awks) build/bin/adu build/bin/ex scripts/generate-initramfs $(locales)
 	scripts/generate-initramfs
 
-build/bzImage:
-	scripts/build-linux http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.14.2.tar.xz
+build/bzImage: sources/linux
+	scripts/build-linux2
+	#scripts/build-linux http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.14.2.tar.xz
 
 hda: build/bzImage initramfs.cpio.gz 
 	qemu-img create -f qcow2 hda.tmp 1M
@@ -91,6 +92,9 @@ build/bin/dash: build/dash-$(dash_version)
 	scripts/build-shell dash "$(dash_version)" dash
 	scripts/add-trigger 'd#'  'setsid dash -l' "dash-0.5.8" \
 						'sh#' 'setsid sh -l'   "d#"
+sources/linux:
+	git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git "$@"
+
 build/bin/bash1: build/bash-$(bash1_version)
 	scripts/build-shell bash $(bash1_version) bash1
 	scripts/add-trigger '1#' "ln -sf bash1 /bin/bash;setsid bash -login" bash-1.14
