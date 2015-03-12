@@ -5,8 +5,8 @@ shells = build/bin/bash+ build/bin/mksh build/bin/bsh
 bash1_version = 1.14.7
 shells += build/bin/bash1
 
-bash25a_version = 2.05a.0
-shells += build/bin/bash25a
+#bash25a_version = 2.05a.0
+#shells += build/bin/bash25a
 bash25b_version = 2.05b.12
 shells += build/bin/bash25b
 

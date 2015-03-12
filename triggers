@@ -1,21 +1,20 @@
-#	setsid bash -l	43#
-+#	setsid bash+ -l	bash-devel
-1#	setsid bash1 -login	bash-1.14.7
-2#	setsid bash2 -l	25b#
-25a#	setsid bash25a --login	bash-2.05a.0
-25b#	setsid bash25b -l	bash-2.05b.12
-3#	setsid bash3 -l	32#
-30#	setsid bash30 -l	bash-3.00.21
-31#	setsid bash31 -l	bash-3.1.22
-32#	setsid bash32 -l	bash-3.2.56
-4#	setsid bash4 -l	43#
-40#	setsid bash40 -l	bash-4.0.43
-41#	setsid bash41 -l	bash-4.1.16
-42#	setsid bash42 -l	bash-4.2.52
-43#	setsid bash43 -l	bash-4.3.29
+#	setsid bash -l	4#
++#	ln -sf bash+ /bin/bash;setsid bash -l	bash-devel
+1#	ln -sf bash1 /bin/bash;setsid bash -login	bash-1.14
+2#	ln -sf bash2 /bin/bash;setsid bash -l	25b#
+25b#	ln -sf bash25b /bin/bash;setsid bash -l	bash-2.05b
+3#	ln -sf bash3 /bin/bash;setsid bash -l	32#
+30#	ln -sf bash30 /bin/bash;setsid bash -l	bash-3.00
+31#	ln -sf bash31 /bin/bash;setsid bash -l	bash-3.1
+32#	ln -sf bash32 /bin/bash;setsid bash -l	bash-3.2
+4#	ln -sf bash4 /bin/bash;setsid bash -l	43#
+40#	ln -sf bash40 /bin/bash;setsid bash -l	bash-4.0
+41#	ln -sf bash41 /bin/bash;setsid bash -l	bash-4.1
+42#	ln -sf bash42 /bin/bash;setsid bash -l	bash-4.2
+43#	ln -sf bash43 /bin/bash;setsid bash -l	bash-4.3
 b#	PS1= TIMEOUT=1 exec -l bsh -i	bourne
-d#	setsid dash -l			dash-0.5.7
+d#	setsid dash -l	dash-0.5.8
 j#	PS1= TIMEOUT=1 exec -l jsh -i	bourne(w/job)
 k#	setsid ksh -l			ksh93
-m#	setsid mksh -l	mksh R50 2014/09/03
-sh#	setsid sh -l			d#
+m#	setsid mksh -l	mksh R50
+sh#	setsid sh -l	d#
