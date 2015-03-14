@@ -29,13 +29,17 @@ shells += build/bin/bash43
 awks = build/bin/gawk3 build/bin/gawk4 build/bin/mawk \
        build/bin/nawk build/bin/oawk
 
+locales += build/locales/en_US.UTF-8
+locales += build/locales/nb_NO.UTF-8
+locales += build/locales/de_DE.UTF-8
+
 evalbot: hda
 	 
 
 initramfs.cpio.gz: initramfs
 	{ cd initramfs && pax -x sv4cpio -w .; } | gzip -9 > initramfs.cpio.gz
 
-initramfs: $(shells) $(awks) build/bin/adu build/bin/ex scripts/generate-initramfs
+initramfs: $(shells) $(awks) build/bin/adu build/bin/ex scripts/generate-initramfs $(locales)
 	scripts/generate-initramfs
 
 build/bzImage:
@@ -122,3 +126,8 @@ build/bin/adu:
 	scripts/build-adu
 build/bin/ex:
 	scripts/build-ex-vi
+
+build/locales/%:
+	set -x; \
+	x="$@" locale=$${x##*/} lang=$${locale%.*} enc=$${locale#"$$lang."}; \
+	localedef --no-archive -c -i "$$lang" -f "$$enc" "$@"
