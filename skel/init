@@ -20,7 +20,7 @@ stty -echo
 HOME=/root
 LOGNAME=root
 PATH=/usr/bin:/bin
-PS1='$({ echo ${_x+o}>/proc/sysrq-trigger;set +x; } 2>/dev/null)${_x=}'
+PS1='$({ echo ${_x+o}>|/proc/sysrq-trigger;set +x; } 2>/dev/null)${_x=}'
 PS2="Missing terminating quote, bracket or keyword"
 SHELL=/bin/bash
 TERM=dumb
