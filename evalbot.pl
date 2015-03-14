@@ -83,6 +83,8 @@ sub message
         $conn->privmsg($event->to, "Core dumped.");
     } elsif( $msg =~/^# botsmack$/ ) {
         $conn->privmsg($event->to, "Segmentation fault");
+    } elsif( $msg =~/^# who am i$/ ) {
+        $conn->privmsg($event->to, $event->nick . ": " . $event->nick);
     } elsif( $msg =~/^([^#]*)# (.*)/ ) {
         open(FOO, "-|", "./evalcmd", "$1", "$2");
         while(<FOO>) {

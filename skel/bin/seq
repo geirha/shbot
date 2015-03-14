@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash4
 
 start=1 step=1 end=0 
 

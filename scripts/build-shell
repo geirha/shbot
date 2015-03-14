@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/usr/bin/env bash
 shopt -s extglob
 
 shell=$1 version=$2 bin_name=${3:-$shell$version}
@@ -24,10 +24,29 @@ case $shell in
             pax -rs '|^[^/]*|heirloom-sh|' &&
         cd heirloom-sh &&
         make &&
-        cp sh ../bin/$bin_name &&
-        cp sh.1 ../man/man1/$bin_name.1
+        cp sh "../bin/$bin_name" &&
+        cp sh.1 "../man/man1/$bin_name.1"
         exit
     ;;
+    dash)
+        cd build/dash-$version &&
+        ./autogen.sh &&
+        ./configure &&
+        make &&
+        cp src/dash "../bin/$bin_name" &&
+        cp src/dash.1 "../man/man1/$bin_name.1"
+        exit
+    ;;
+	posh)
+		cd "build/posh-$version" &&
+		aclocal &&
+		autoreconf -i &&
+		./configure &&
+		make &&
+		cp posh "../bin/$bin_name" &&
+		cp posh.1 "../man/man1/$bin_name.1"
+		exit
+	;;
     bash) : ;; #handled below
     *) exit 1;;
 esac

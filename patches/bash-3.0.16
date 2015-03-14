@@ -574,4 +574,130 @@ Patch:
 ! #define PATCHLEVEL 21
   
   #endif /* _PATCHLEVEL_H_ */
+			     BASH PATCH REPORT
+			     =================
+
+Bash-Release: 3.0
+Patch-ID: bash30-022
+
+Bug-Reported-by:	Michal Zalewski <lcamtuf@coredump.cx>
+Bug-Reference-ID:
+Bug-Reference-URL:
+
+Bug-Description:
+
+A combination of nested command substitutions and function importing from
+the environment can cause bash to execute code appearing in the environment
+variable value following the function definition.
+
+Patch:
+
+*** ../bash-3.0.21/builtins/evalstring.c	2014-09-16 21:57:03.000000000 -0400
+--- builtins/evalstring.c	2014-10-04 16:18:59.000000000 -0400
+***************
+*** 42,45 ****
+--- 42,46 ----
+  #include "../redir.h"
+  #include "../trap.h"
++ #include "../bashintl.h"
+  
+  #if defined (HISTORY)
+***************
+*** 220,229 ****
+  	      struct fd_bitmap *bitmap;
+  
+! 	      if ((flags & SEVAL_FUNCDEF) && command->type != cm_function_def)
+  		{
+! 		  internal_warning ("%s: ignoring function definition attempt", from_file);
+! 		  should_jump_to_top_level = 0;
+! 		  last_result = last_command_exit_value = EX_BADUSAGE;
+! 		  break;
+  		}
+  
+--- 221,243 ----
+  	      struct fd_bitmap *bitmap;
+  
+! 	      if (flags & SEVAL_FUNCDEF)
+  		{
+! 		  char *x;
+! 
+! 		  /* If the command parses to something other than a straight
+! 		     function definition, or if we have not consumed the entire
+! 		     string, or if the parser has transformed the function
+! 		     name (as parsing will if it begins or ends with shell
+! 		     whitespace, for example), reject the attempt */
+! 		  if (command->type != cm_function_def ||
+! 		      ((x = parser_remaining_input ()) && *x) ||
+! 		      (STREQ (from_file, command->value.Function_def->name->word) == 0))
+! 		    {
+! 		      internal_warning (_("%s: ignoring function definition attempt"), from_file);
+! 		      should_jump_to_top_level = 0;
+! 		      last_result = last_command_exit_value = EX_BADUSAGE;
+! 		      reset_parser ();
+! 		      break;
+! 		    }
+  		}
+  
+***************
+*** 281,285 ****
+  
+  	      if (flags & SEVAL_ONECMD)
+! 		break;
+  	    }
+  	}
+--- 295,302 ----
+  
+  	      if (flags & SEVAL_ONECMD)
+! 		{
+! 		  reset_parser ();
+! 		  break;
+! 		}
+  	    }
+  	}
+*** ../bash-3.0.21/parse.y	2014-09-30 19:53:28.000000000 -0400
+--- parse.y	2014-10-04 16:18:59.000000000 -0400
+***************
+*** 2105,2108 ****
+--- 2105,2118 ----
+  }
+  
++ char *
++ parser_remaining_input ()
++ {
++   if (shell_input_line == 0)
++     return 0;
++   if (shell_input_line_index < 0 || shell_input_line_index >= shell_input_line_len)
++     return '\0';	/* XXX */
++   return (shell_input_line + shell_input_line_index);
++ }
++ 
+  #ifdef INCLUDE_UNUSED
+  /* Back the input pointer up by one, effectively `ungetting' a character. */
+*** ../bash-3.0.21/shell.h	2003-06-01 15:04:36.000000000 -0400
+--- shell.h	2014-10-04 16:18:59.000000000 -0400
+***************
+*** 160,163 ****
+--- 160,165 ----
+  
+  /* Let's try declaring these here. */
++ extern char *parser_remaining_input __P((void));
++ 
+  extern sh_parser_state_t *save_parser_state __P((sh_parser_state_t *));
+  extern void restore_parser_state __P((sh_parser_state_t *));
+
+*** ../bash-3.0/patchlevel.h	Wed Aug 22 08:05:39 2001
+--- patchlevel.h	Thu Sep  2 15:04:32 2004
+***************
+*** 26,30 ****
+     looks for to find the patch level (for the sccs version string). */
+  
+! #define PATCHLEVEL 21
+  
+  #endif /* _PATCHLEVEL_H_ */
+--- 26,30 ----
+     looks for to find the patch level (for the sccs version string). */
+  
+! #define PATCHLEVEL 22
+  
+  #endif /* _PATCHLEVEL_H_ */
 EOF
