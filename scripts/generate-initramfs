@@ -301,6 +301,7 @@ declare -A commands='(
     [bash43]="GNU Bourne-Again SHell 4.3.x"
     [bash+]="GNU Bourne-Again Shell devel branch"
     [bsh]="the standard command interpreter"
+    [posh]="Policy-compliant Ordinary SHell"
     [gawk3]="pattern scanning and processing language"
     [gawk4]="pattern scanning and processing language"
     [mawk]="pattern scanning and text processing language"
