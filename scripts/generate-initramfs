@@ -361,6 +361,11 @@ if [[ ${command_paths[file]} ]]; then
         warn "couldn't copy file's magic databse. file won't work."
 fi
 
+# locales
+mkdir -p initramfs/usr/lib/locale &&
+localedef --add-to-archive --prefix=initramfs build/locales/* ||
+    warn "failed to include locales."
+
 # etc/nsswitch.conf uses compat, so we'll need the corresponding so-file.
 cp "$(ldconfig -p|awk '$1=="libnss_compat.so.2"{print $NF;exit}')" "initramfs/lib/libnss_compat.so.2"
 
