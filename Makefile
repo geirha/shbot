@@ -7,8 +7,8 @@ shells += build/bin/bash1
 
 bash25_version = 2.05.0
 shells += build/bin/bash25
-bash25a_version = 2.05a.0
-shells += build/bin/bash25a
+#bash25a_version = 2.05a.0
+#shells += build/bin/bash25a
 bash25b_version = 2.05b.13
 shells += build/bin/bash25b
 
@@ -98,7 +98,7 @@ build/bin/bash25a: build/bash-$(bash25a_version)
 	scripts/add-trigger '25a#' "ln -sf bash25a /bin/bash;setsid bash --login" bash-2.05a
 build/bin/bash25b: build/bash-$(bash25b_version)
 	scripts/build-shell bash $(bash25b_version) bash25b
-	scripts/add-trigger '25b#' "ln -sf bash25b /bin/bash;setsid bash -l" bash-2.05b
+	scripts/add-trigger '25b#' "ln -sf bash25b /bin/bash;setsid bash -l" bash-2.05b \
 	                    '2#'   "ln -sf bash2 /bin/bash;setsid bash -l"   "25b#"
 build/bin/bash30: build/bash-$(bash30_version)
 	scripts/build-shell bash $(bash30_version) bash30
@@ -108,7 +108,7 @@ build/bin/bash31: build/bash-$(bash31_version)
 	scripts/add-trigger '31#' "ln -sf bash31 /bin/bash;setsid bash -l" bash-3.1
 build/bin/bash32: build/bash-$(bash32_version)
 	scripts/build-shell bash $(bash32_version) bash32
-	scripts/add-trigger '32#' "ln -sf bash32 /bin/bash;setsid bash -l" bash-3.2
+	scripts/add-trigger '32#' "ln -sf bash32 /bin/bash;setsid bash -l" bash-3.2 \
 	                    '3#'  "ln -sf bash3 /bin/bash;setsid bash -l"  "32#"
 build/bin/bash40: build/bash-$(bash40_version)
 	scripts/build-shell bash $(bash40_version) bash40
@@ -121,7 +121,7 @@ build/bin/bash42: build/bash-$(bash42_version)
 	scripts/add-trigger '42#' "ln -sf bash42 /bin/bash;setsid bash -l" bash-4.2
 build/bin/bash43: build/bash-$(bash43_version)
 	scripts/build-shell bash $(bash43_version) bash43
-	scripts/add-trigger '43#' "ln -sf bash43 /bin/bash;setsid bash -l" bash-4.3
+	scripts/add-trigger '43#' "ln -sf bash43 /bin/bash;setsid bash -l" bash-4.3 \
 	                    '4#'  "ln -sf bash4 /bin/bash;setsid bash -l"  "43#" \
 	                    '#'   "setsid bash -l"  "4#"
 build/bin/bash+: build/bash-devel
