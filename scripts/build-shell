@@ -1,21 +1,19 @@
-#!/bin/bash -x
+#!/usr/bin/env bash
 shopt -s extglob
 
 shell=$1 version=$2 bin_name=${3:-$shell$version}
 srcdir=$PWD
 
+if [[ -v VERBOSE ]]; then
+    mkdir() { command mkdir -v "$@"; }
+    cp() { command cp -v "$@"; }
+    rm() { command rm -v "$@"; }
+    bzip2() { command bzip2 -v "$@"; }
+fi
+
 mkdir -p build/{bin,man/man1} || exit
 
 case $shell in
-    mksh)
-        (cd sources/mksh && cvs update) &&
-        mkdir -p build/mksh &&
-        cd build/mksh &&
-        sh "$srcdir/sources/mksh/Build.sh" &&
-        cp mksh "../bin/$bin_name" &&
-        cp "$srcdir/sources/mksh/mksh.1" "../man/man1/$bin_name.1"
-        exit
-    ;;
     bourne)
         cd build &&
         wget -c -O "$srcdir/sources/heirloom-sh.tar.bz2" \

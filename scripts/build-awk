@@ -17,10 +17,10 @@ case $awk in
         cp awk.1 ../man/man1/bwk.1
     ;;
     oawk)
-        wget -c -O "$srcdir/sources/heirloom-070715.tar.bz2" \
-            http://sourceforge.net/projects/heirloom/files/heirloom/070715/heirloom-070715.tar.bz2/download &&
-        bzip2 -cd "$srcdir/sources/heirloom-070715.tar.bz2" | pax -r &&
-        cd heirloom-070715 &&
+#        wget -c -O "$srcdir/sources/heirloom-070715.tar.bz2" \
+#            http://sourceforge.net/projects/heirloom/files/heirloom/070715/heirloom-070715.tar.bz2/download &&
+#        bzip2 -cd "$srcdir/sources/heirloom-070715.tar.bz2" | pax -r &&
+#        cd heirloom-070715 &&
         make {libcommon,libuxre,oawk}/Makefile
         make -C libcommon &&
         make -C libuxre &&

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ $VERBOSE = 1 ]]; then
+if [[ -v VERBOSE ]]; then
     cp() { command cp -v "$@"; }
     mkdir() { command mkdir -v "$@"; }
     rm() { command rm -v "$@"; }

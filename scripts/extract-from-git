@@ -1,5 +1,17 @@
 #!/bin/bash
 # usage: extract-from-git build/bash-x.y.z
+# add VERBOSE to the environment for verbosity
+
+extract() {
+    if type pax >/dev/null 2>&1; then
+        pax ${VERBOSE+-v} -r "$@"
+    elif type tar >/dev/null 2>&1; then
+        tar ${VERBOSE+-v} -xf-
+    else
+        printf >&2 'Neither the standard archiver (pax) nor tar found.\n'
+        exit 1
+    fi
+}
 
 die() { local ret=$?; printf '%s\n' "$@" >&2; exit "$ret"; }
 
@@ -13,7 +25,7 @@ declare -A versions='(
     [bash-4.0.38]=89a92869e56aba4e4cab2d639c00a86f0545c862
     [bash-4.1.11]=bash-4.1.11
     [bash-4.2.45]=f281b8f4f8936b2713966274d9f8508a9f0910e4
-    [bash-4.3.29]=origin/master
+    [bash-4.3.33]=origin/master
     [bash-devel]=origin/devel
 )'
 
@@ -27,11 +39,11 @@ if [[ ! ${versions[$ver]} ]]; then
 fi
 commit=${versions[$basever]?Unknown version: $ver}
 
-mkdir -p "$1" || exit 
+mkdir ${VERBOSE+-v} -p "$1" || exit 
 {
-    cd bash && 
+    cd sources/bash && 
     git archive --prefix="$1/" --format=tar "$commit"
-} | pax -r
+} | extract
 
 if [[ -x patches/$basever ]]; then
     cd "$1" && "../../patches/$basever"
