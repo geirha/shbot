@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 exec kvm -monitor null -hda hda -net none -m 64 -nographic -loadvm 1 -no-kvm 2>/dev/null << EOF
 $1
 $RANDOM

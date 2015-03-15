@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 processHooks() {
     if [[ -f manpages && $2 = "man "[![:blank:]]* ]]; then
@@ -38,7 +38,7 @@ if [[ $1 = -n ]]; then
     shift
 fi
 
-t=${1:-4}\#
+t=$1\#
 declare -A triggers='()' versions='()'
 indices=()
 while IFS=$'\t' read -r trigger shell version; do

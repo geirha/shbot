@@ -289,6 +289,7 @@ declare -A commands='(
 
     ## Built with build-bash and build-awk
     [bash1]="GNU Bourne-Again SHell 1.14.x"
+    [bash25]="GNU Bourne-Again SHell 2.05.x"
     [bash25a]="GNU Bourne-Again SHell 2.05a.x"
     [bash25b]="GNU Bourne-Again SHell 2.05b.x"
     [bash30]="GNU Bourne-Again SHell 3.0.x"
@@ -300,6 +301,7 @@ declare -A commands='(
     [bash43]="GNU Bourne-Again SHell 4.3.x"
     [bash+]="GNU Bourne-Again Shell devel branch"
     [bsh]="the standard command interpreter"
+    [posh]="Policy-compliant Ordinary SHell"
     [gawk3]="pattern scanning and processing language"
     [gawk4]="pattern scanning and processing language"
     [mawk]="pattern scanning and text processing language"
@@ -359,6 +361,11 @@ if [[ ${command_paths[file]} ]]; then
         warn "couldn't copy file's magic databse. file won't work."
 fi
 
+# locales
+mkdir -p initramfs/usr/lib/locale &&
+localedef --add-to-archive --prefix=initramfs build/locales/* ||
+    warn "failed to include locales."
+
 # etc/nsswitch.conf uses compat, so we'll need the corresponding so-file.
 cp "$(ldconfig -p|awk '$1=="libnss_compat.so.2"{print $NF;exit}')" "initramfs/lib/libnss_compat.so.2"
 
@@ -376,7 +383,7 @@ cp "$(ldconfig -p|awk '$1=="libnss_compat.so.2"{print $NF;exit}')" "initramfs/li
 
 shopt -s nullglob
 # find latest bash 2.x
-for f in initramfs/bin/bash25[ab]; do :; done
+for f in initramfs/bin/bash2*; do :; done
 ln -sf "${f##*/}" initramfs/bin/bash2
 manpages[bash2]=${manpages[${f##*/}]}
 

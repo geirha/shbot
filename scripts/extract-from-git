@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # usage: extract-from-git build/bash-x.y.z
 # add VERBOSE to the environment for verbosity
 
@@ -16,7 +16,9 @@ extract() {
 die() { local ret=$?; printf '%s\n' "$@" >&2; exit "$ret"; }
 
 declare -A versions='(
+    # from bash repo
     [bash-1.14.7]=726f63884db0132f01745f1fb4465e6621088ccf
+    [bash-2.05.0]=28ef6c316f1aff914bb95ac09787a3c83c1815fd
     [bash-2.05a.0]=f73dda092b33638d2d5e9c35375f687a607b5403
     [bash-2.05b.0]=7117c2d221b2aed4ede8600f6a36b7c1454b4f55
     [bash-3.0.16]=eb87367179effbe5f430236db8259006d71438b7
@@ -27,17 +29,24 @@ declare -A versions='(
     [bash-4.2.45]=f281b8f4f8936b2713966274d9f8508a9f0910e4
     [bash-4.3.33]=origin/master
     [bash-devel]=origin/devel
+
+    # from dash repo
+    [dash-0.5.8]=v0.5.8
+
+	# from posh repo
+	[posh-0.12.3]=debian/0.12.3
 )'
 
 ver=${1##*/}
-basever=$ver
-if [[ ! ${versions[$ver]} ]]; then 
-    IFS=. read -r major minor patch <<< "${ver#bash-}"
-    while [[ ! ${versions[$basever]} && $patch != 0 ]]; do
-        basever=bash-$major.$minor.$((--patch))
-    done
-fi
-commit=${versions[$basever]?Unknown version: $ver}
+if [[ $ver = bash* ]]; then 
+    basever=$ver
+    if [[ ! ${versions[$ver]} ]]; then 
+        IFS=. read -r major minor patch <<< "${ver#bash-}"
+        while [[ ! ${versions[$basever]} && $patch != 0 ]]; do
+            basever=bash-$major.$minor.$((--patch))
+        done
+    fi
+    commit=${versions[$basever]?Unknown version: $ver}
 
 mkdir ${VERBOSE+-v} -p "$1" || exit 
 {
@@ -45,6 +54,27 @@ mkdir ${VERBOSE+-v} -p "$1" || exit
     git archive --prefix="$1/" --format=tar "$commit"
 } | extract
 
-if [[ -x patches/$basever ]]; then
-    cd "$1" && "../../patches/$basever"
+    if [[ -x patches/$basever ]]; then
+        cd "$1" && "../../patches/$basever"
+    fi
+elif [[ $ver = dash* ]]; then
+    commit=${versions[$ver]?Unkown version: $ver}
+    mkdir -p "$1" || exit
+    {
+        cd dash &&
+        git archive --prefix="$1/" --format=tar "$commit"
+    } | pax -r
+    if [[ -x patches/$ver ]]; then
+        cd "$1" && "../../patches/$ver"
+    fi
+elif [[ $ver = posh* ]]; then
+	commit=${versions[$ver]?Unknown version: $ver}
+	mkdir -p "$1" || exit
+	{
+		cd sources/posh &&
+		git archive --prefix="$1/" --format=tar "$commit"
+	} | pax -r
+	if [[ -x patches/$ver ]]; then
+		cd "$1" && "../../patches/$ver"
+	fi
 fi
