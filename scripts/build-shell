@@ -54,7 +54,8 @@ case $version in
     devel)
         mkdir -p build/loadables &&
         cd build/bash-devel &&
-        ./configure &&
+        ./configure --disable-{largefile,nls,readline,net-redirections} \
+                    --without-bash-malloc &&
         make &&
         cp bash "../bin/$bin_name" &&
         cp doc/bash.1 "../man/man1/$bin_name.1" &&
@@ -63,6 +64,7 @@ case $version in
         make &&
         for file in !(*.*); do
             [[ -f $file && -x $file ]] || continue
+            strip "$file"
             cp "${file}" ../../../loadables
         done
     ;;
@@ -75,7 +77,8 @@ case $version in
     *)
         cd "build/bash-$version" &&
         rm -f y.tab.[co] &&
-        ./configure &&
+        ./configure --disable-{largefile,nls,readline,net-redirections} \
+                    --without-bash-malloc &&
         make &&
         cp bash "../bin/$bin_name" &&
         cp doc/bash.1 "../man/man1/$bin_name.1"
