@@ -41,16 +41,6 @@ case $awk in
         cp a.out ../bin/nawk &&
         cp awk.1 ../man/man1/nawk.1
     ;;
-    gawk)
-        wget -c -O "$srcdir/sources/gawk-$version.tar.gz" \
-            "http://ftp.gnu.org/gnu/gawk/gawk-$version.tar.gz" &&
-        gzip -cd "$srcdir/sources/gawk-$version.tar.gz" | pax -r &&
-        cd "gawk-$version" &&
-        ./configure &&
-        make &&
-        cp gawk "../bin/$bin_name" &&
-        cp doc/gawk.1 "../man/man1/$bin_name.1"
-    ;;
     mawk)
         wget -c -O "$srcdir/sources/mawk.tar.gz" \
             http://invisible-island.net/datafiles/release/mawk.tar.gz &&

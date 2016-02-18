@@ -27,14 +27,14 @@ declare -A versions='(
     [bash-4.0.38]=89a92869e56aba4e4cab2d639c00a86f0545c862
     [bash-4.1.11]=bash-4.1.11
     [bash-4.2.45]=f281b8f4f8936b2713966274d9f8508a9f0910e4
-    [bash-4.3.33]=origin/master
-    [bash-devel]=origin/devel
+    [bash-4.3.42]=master
+    [bash-devel]=devel
 
     # from dash repo
     [dash-0.5.8]=v0.5.8
 
-	# from posh repo
-	[posh-0.12.3]=debian/0.12.3
+    # from posh repo
+    [posh-0.12.3]=debian/0.12.3
 )'
 
 ver=${1##*/}
@@ -48,11 +48,11 @@ if [[ $ver = bash* ]]; then
     fi
     commit=${versions[$basever]?Unknown version: $ver}
 
-mkdir ${VERBOSE+-v} -p "$1" || exit 
-{
-    cd sources/bash && 
-    git archive --prefix="$1/" --format=tar "$commit"
-} | extract
+    mkdir ${VERBOSE+-v} -p "$1" || exit 
+    {
+        cd sources/bash && 
+        git archive --prefix="$1/" --format=tar "$commit"
+    } | extract
 
     if [[ -x patches/$basever ]]; then
         cd "$1" && "../../patches/$basever"
@@ -61,20 +61,32 @@ elif [[ $ver = dash* ]]; then
     commit=${versions[$ver]?Unkown version: $ver}
     mkdir -p "$1" || exit
     {
-        cd dash &&
+        cd sources/dash &&
         git archive --prefix="$1/" --format=tar "$commit"
-    } | pax -r
+    } | extract
     if [[ -x patches/$ver ]]; then
         cd "$1" && "../../patches/$ver"
     fi
 elif [[ $ver = posh* ]]; then
-	commit=${versions[$ver]?Unknown version: $ver}
-	mkdir -p "$1" || exit
-	{
-		cd sources/posh &&
-		git archive --prefix="$1/" --format=tar "$commit"
-	} | pax -r
-	if [[ -x patches/$ver ]]; then
-		cd "$1" && "../../patches/$ver"
-	fi
+        commit=${versions[$ver]?Unknown version: $ver}
+        mkdir -p "$1" || exit
+        {
+            cd sources/posh &&
+            git archive --prefix="$1/" --format=tar "$commit"
+        } | extract
+        if [[ -x patches/$ver ]]; then
+            cd "$1" && "../../patches/$ver"
+        fi
+elif [[ $ver = gawk-* ]]; then
+    mkdir -p "$1" || exit
+    {
+        cd sources/gawk &&
+        git archive --prefix="$1/" --format=tar "$ver"
+    } | extract
+    if [[ -x patches/$ver ]]; then
+        cd "$1" && "../../patches/$var"
+    fi
+else
+    printf >&2 '%s: %s: Unknown\n' "$0" "$ver"
+    exit 1
 fi
