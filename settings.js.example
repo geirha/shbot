@@ -1,0 +1,12 @@
+
+module.exports = {
+    server: 'irc.freenode.net',
+    nick: 'botnick',
+    irc: {
+        userName: 'botuser',
+        password: 'secret',
+        debug: false,
+        sasl: true,
+        channels: ["#evalbot"]
+    }
+};

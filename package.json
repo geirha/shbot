@@ -1,0 +1,14 @@
+{
+  "name": "shbot",
+  "version": "0.0.1",
+  "description": "Replacement for evalbot.pl",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Geir Hauge <geir.hauge@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "irc": "^0.4.1"
+  }
+}
