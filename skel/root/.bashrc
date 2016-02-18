@@ -3,6 +3,9 @@ set +H
 
 SECONDS=0
 
+# Shorter way to enable most builtins
+e() { enable -f "$1" "$1"; }
+
 # The remaining code won't work with bash 1.x
 case $BASH_VERSION in 1.*) return;; esac
 
@@ -22,4 +25,9 @@ shopt -s extglob
 # globstar was introduced in 4.0
 if (( BASH_VERSINFO[0] >= 4 )); then
     shopt -s globstar
+fi
+
+# Special case for trigger +#, enable all loadables
+if [[ ${BASH_VERSINFO[4]} != release ]]; then
+    source loadables
 fi
