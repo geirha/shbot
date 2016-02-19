@@ -2,6 +2,8 @@
 if [[ $1 = @(-h|--help) ]]; then
     printf 'no\n'
     exit
+elif [[ $1 = -- ]]; then
+    shift
 fi
 unset s
 (( $# )) && s="$*"
