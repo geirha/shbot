@@ -19,6 +19,7 @@ if(!$nick)     { die "nick unspecified"; }
 if(!$password) { die "password unspecified"; }
 if(!$server)   { die "irc server unspecified"; }
 if(!$owner)    { die "owner unspecified"; }
+if(!$trigger)  { die "trigger unspecified"; }
 if(scalar @channels == 0) { print "No channels specified. Continuing anyways\n"; }
 
 $SIG{'INT'} = 'my_sigint_catcher';
@@ -85,7 +86,7 @@ sub message
         $conn->privmsg($event->to, "Segmentation fault");
     } elsif( $msg =~/^# who am i$/ ) {
         $conn->privmsg($event->to, $event->nick . ": " . $event->nick);
-    } elsif( $msg =~/^([^#]*)# (.*)/ ) {
+    } elsif( $msg =~ $trigger ) {
         open(FOO, "-|", "./evalcmd", "$1", "$2");
         while(<FOO>) {
             $conn->privmsg($event->to, $event->nick . ": $_");

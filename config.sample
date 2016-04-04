@@ -16,5 +16,7 @@ $nickserv="";
 # The channels to join
 @channels=("#bash", "#evalbot", "#awk", "##sed", "##bash-fr");
 
+$trigger=/^([^#]*)# (.*)/;
+
 # Just leave this
 true;
