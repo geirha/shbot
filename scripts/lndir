@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+shopt -s extglob
+
+if (( $# != 2 )); then
+    printf >&2 'Usage: lndir source dest\n'
+    exit 1
+fi
+
+cd "$2" || exit
+lndir() {
+    local file dir
+    : "$PWD"
+    for file in "$1"/*; do
+        if [[ -d $file ]]; then
+            dir=${file#"$1/"}
+            [[ $file = /* ]] || file=../$file
+            mkdir -p "$dir" &&
+            ( cd "$dir" && lndir "$file" )
+        else
+            ln -s "$file" .
+        fi
+    done
+}
+
+lndir "$1"
