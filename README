@@ -1,26 +1,7 @@
 Shbot is an IRC bot that runs shell code. It is a fork of evalbot
 (http://www.vidarholen.net/contents/evalbot/).
 
-To build, you'll need
+To run shbot, you need an initramfs image and a kernel, which you can find here:
+https://github.com/geirha/shbot-initramfs/releases
 
-- Typical build tools: A C compiler, make, yacc, lex patch
-- Header files of libraries needed to build bash, awk, mksh etc.
-- Other standard and typical commands, like gzip, bzip2 and pax.
-
-To grab the latest bash development branch from Git so it can be built
-
-    git submodule init && git submodule update && cd bash && \
-    git checkout devel
-
-For Ubuntu/Debian
-
-    sudo apt-get install build-essential pax ncompress
-    sudo apt-get build-dep bash gawk mawk ksh mksh
-
-For Fedora/CentOS
-    sudo yum install pax patch ncompress flex byacc bison
-    sudo yum-builddep bash gawk mawk ksh mksh
-
-Should get most, if not all, build requirements down.
-
-Run make
+Save the files as `shbot.cpio.gz` and `shbot-kernel`, then run `make`
