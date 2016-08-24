@@ -1,2 +1,0 @@
-#!/bin/sh
-exec bzip2 -d ${1+"$@"}

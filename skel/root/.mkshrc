@@ -1,3 +1,0 @@
-# when emacs mode is on, it "overrides" stty -echo
-set +o emacs
-PS1='$({ print -n ${_x+o}>/proc/sysrq-trigger;set +x; } 2>/dev/null)${_x=}'
