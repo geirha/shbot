@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-exec qemu-system-x86_64 -monitor null -hda hda -net none -m 64 -nographic -loadvm 1 2>/dev/null << EOF
+exec qemu-system-x86_64 -monitor null -hda hda -net none -m 72 -nographic -loadvm 1 2>/dev/null << EOF
 $1
 $(date -u +%s)
 $2

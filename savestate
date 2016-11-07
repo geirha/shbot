@@ -4,7 +4,7 @@ image="$1"
 mkfifo fifo # &> /dev/null
 [[ -r fifo && -w fifo && -p fifo ]] || { echo "fifo fail"; exit 1; }
 
-< fifo qemu-system-x86_64 -kernel shbot-kernel -initrd shbot.cpio.gz -hda "$image" -net none -m 64 -nographic -append irc |
+< fifo qemu-system-x86_64 -kernel shbot-kernel -initrd shbot.cpio.gz -hda "$image" -net none -m 72 -nographic -append irc |
     while read -r f
     do
         printf '%s\n' "$f" >&2
