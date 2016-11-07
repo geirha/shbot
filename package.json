@@ -9,6 +9,7 @@
   "author": "Geir Hauge <geir.hauge@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "blessed": "^0.1.81",
     "irc": "^0.4.1"
   }
 }

@@ -2,7 +2,15 @@
 
 var irc = require('irc'),
     settings = require('./settings.js'),
-    child_process = require('child_process');
+    child_process = require('child_process'),
+    bless = require('./bless'),
+    util = require('util');
+
+var ui = bless();
+console.log = function() {
+    ui.log.pushLine(util.format.apply(util, arguments));
+};
+
 
 function evalcmd(trigger, command, target, nick) {
     var prefix = "";
@@ -39,17 +47,23 @@ client.addListener('error', function(err) {
 client.addListener('message', function(from, to, message) {
     console.log("message: ", from, to, message);
 });
+client.addListener('kill', function(nick, reason, channels, message) {
+    console.log("kill", nick, reason, channels, message);
+});
+client.addListener('registered', function(message) {
+    console.log("registered", message);
+});
 
 client.addListener("raw", function(message) {
     switch (message.command) {
         case "900": // You are now logged in as <userName>
             console.log(message.args[3]);
             break;
-        case "MODE":
-            if (message.args[0] === "shbot" && message.args[1] === "+i")
-                client.say("geirha", "I am alive");
-            break;
     }
+});
+
+client.addListener("ping", function(server) {
+    console.log(server,"ping");
 });
 
 client.addListener('message#', function(nick, channel, text, message) {
@@ -79,4 +93,30 @@ client.addListener('pm', function(nick, text, message) {
         evalcmd(m[1], m[2], nick);
     else 
         evalcmd("", text, nick);
+});
+
+
+ui.on('line', function(value) {
+    var match;
+    if ( match = value.match(/^say\s+([^\s]+)\s(.*)/) ) {
+        client.say(match[1], match[2]);
+    }
+    else if ( match = value.match(/^nick\s+(.+)/) ) {
+        client.send('NICK', match[1]);
+    }
+    else if ( match = value.match(/^(join|part)\s+(.+)/) ) {
+        if ( match[1] === 'join')
+            client.join(match[2]);
+        else if ( match[1] === 'part')
+            client.part(match[2]);
+    }
+    else if ( match = value.match(/^(re|dis)?connect$/) ) {
+        if (match[0] === 'disconnect')
+            client.disconnect();
+        else
+            client.connect(0);
+    }
+    else {
+        console.log("Unknown command");
+    }
 });
