@@ -10,6 +10,6 @@
   "license": "MIT",
   "dependencies": {
     "blessed": "^0.1.81",
-    "irc": "^0.4.1"
+    "irc": "^0.5.0"
   }
 }
