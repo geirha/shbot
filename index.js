@@ -11,6 +11,10 @@ console.log = function() {
     ui.log.pushLine(util.format.apply(util, arguments));
 };
 
+console.error = function() {
+    ui.log.pushLine(util.format.apply(util, arguments));
+};
+
 
 function evalcmd(trigger, command, target, nick) {
     var prefix = "";

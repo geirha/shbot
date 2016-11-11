@@ -12,7 +12,7 @@ function UserInterface() {
         top: 0,
         left: 'center',
         width: '100%',
-        height: '100%-2',
+        height: '100%-3',
         border: { type: 'line' },
     });
 
