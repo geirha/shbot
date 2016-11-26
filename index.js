@@ -69,7 +69,7 @@ client.addListener('kill', function(nick, reason, channels, message) {
     console.log("kill", nick, reason, channels, message);
 });
 client.addListener('registered', function(message) {
-    if(client.nick != 'shbot') {
+    if (client.nick !== 'shbot') {
         client.say('nickserv', 'GHOST shbot')
     }
 
@@ -77,10 +77,10 @@ client.addListener('registered', function(message) {
 });
 
 client.addListener('notice', function(nick, to, text, message) {
-    if(nick == 'NickServ' && message.endsWith('has been ghosted')) {
-        client.send('nick', 'shbot')
+    if (nick === 'NickServ' && message.endsWith('has been ghosted')) {
+        client.send('NICK', 'shbot');
     }
-}
+});
 
 client.addListener("raw", function(message) {
     switch (message.command) {
