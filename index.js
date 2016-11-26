@@ -43,13 +43,27 @@ function evalcmd(trigger, command, target, nick) {
     });
 }
 
+function timestamp() {
+    var d = new Date();
+    return [
+        ('0'+d.getHours()).slice(-2),
+        ('0'+d.getMinutes()).slice(-2),
+        ('0'+d.getSeconds()).slice(-2)
+    ].join(':');
+}
+
 var client = new irc.Client(settings.server, settings.nick, settings.irc);
 
 client.addListener('error', function(err) {
     console.log("error: ", err);
 });
+function pad(s, n) {
+    if ( s.length < n )
+        s = (new Buffer(n).fill(' ').toString() + s).slice(-n)
+    return s;
+}
 client.addListener('message', function(from, to, message) {
-    console.log("message: ", from, to, message);
+    console.log(timestamp() + " %s <%s> %s", pad(to, 10), pad(from, 10), message);
 });
 client.addListener('kill', function(nick, reason, channels, message) {
     console.log("kill", nick, reason, channels, message);
