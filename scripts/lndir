@@ -6,7 +6,7 @@ if (( $# != 2 )); then
     exit 1
 fi
 
-cd "$2" || exit
+cd "$2" || exit
 lndir() {
     local file dir
     : "$PWD"
