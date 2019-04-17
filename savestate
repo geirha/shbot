@@ -8,7 +8,7 @@ mkfifo fifo # &> /dev/null
     while read -r f
     do
         printf '%s\n' "$f" >&2
-        if [[ $f = $'Ready\r' ]]; then
+        if [[ "$f" == *"Ready"* ]]; then
             printf '\x01c\nsavevm\nquit\n'
         fi
     done > fifo
